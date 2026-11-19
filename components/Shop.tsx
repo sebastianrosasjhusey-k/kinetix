@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import { money, type Product } from "@/lib/types";
-import { Pouch } from "./Pouch";
+import { PackImage } from "./PackImage";
 import { useCart } from "./Cart";
 
 export function Shop() {
@@ -30,8 +30,9 @@ function Card({ p }: { p: Product }) {
   return (
     <article className="s-card">
       <div className="s-pic">
-        <Pouch name={p.name} variant={v.name} style={p.style} colorA={v.colorA} colorB={v.colorB} size={p.size} />
+        <PackImage slug={p.slug} name={p.name} variant={v.name} />
       </div>
+      <div className="s-info">
       <h3 className="disp">{p.name}</h3>
       <p>{p.description}</p>
       <span className="s-meta">{p.tagline} · {p.size}</span>
@@ -63,6 +64,7 @@ function Card({ p }: { p: Product }) {
       <button type="button" className="add" disabled={soldOut || left < 1} onClick={() => { add(v.id, Math.min(qty, left)); setQty(1); }}>
         {soldOut ? "Agotado" : left < 1 ? "Ya tienes todo el stock en tu pedido" : "Agregar al pedido"}
       </button>
+      </div>
     </article>
   );
 }

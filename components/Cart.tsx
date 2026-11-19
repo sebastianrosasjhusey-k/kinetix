@@ -3,7 +3,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { money, type Product } from "@/lib/types";
-import { Pouch } from "./Pouch";
+import { PackImage } from "./PackImage";
 import { placeOrder } from "@/app/(sitio)/actions";
 
 type Line = { variantId: number; qty: number };
@@ -179,7 +179,7 @@ function CartDrawer() {
             <div className="d-body">
               {rows.map((r) => (
                 <div className="c-it" key={r.variantId}>
-                  <Pouch name={r.p.name} variant={r.v.name} style={r.p.style} colorA={r.v.colorA} colorB={r.v.colorB} size={r.p.size} label={false} />
+                  <PackImage slug={r.p.slug} name={r.p.name} variant={r.v.name} />
                   <div className="c-n">
                     {r.p.name}
                     <small>
