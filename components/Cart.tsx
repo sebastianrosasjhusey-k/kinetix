@@ -12,7 +12,7 @@ function validate(c: { name: string; phone: string; email: string; address: stri
   if (c.district.trim().length < 2) return "Escribe el distrito.";
   return "";
 }
-import { Pouch } from "./Pouch";
+import { PackImage } from "./PackImage";
 import { activeProducts, createOrder, OrderError, PAYMENTS, useDb } from "@/lib/store";
 
 type Line = { variantId: number; qty: number };
@@ -196,7 +196,7 @@ function CartDrawer() {
             <div className="d-body">
               {rows.map((r) => (
                 <div className="c-it" key={r.variantId}>
-                  <Pouch name={r.p.name} variant={r.v.name} style={r.p.style} colorA={r.v.colorA} colorB={r.v.colorB} size={r.p.size} label={false} />
+                  <PackImage slug={r.p.slug} name={r.p.name} variant={r.v.name} />
                   <div className="c-n">
                     {r.p.name}
                     <small>
