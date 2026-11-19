@@ -1,0 +1,68 @@
+/* Panel: misma marca, tratamiento utilitario y denso */
+.adm { min-height: 100vh; display: grid; grid-template-columns: 1fr; background: var(--bg); font-size: 15.5px; }
+@media (min-width: 900px) { .adm { grid-template-columns: 230px minmax(0, 1fr); } }
+.adm-side { background: var(--ink); color: var(--on-ink); padding: 18px; display: flex; flex-direction: column; gap: 18px; }
+@media (max-width: 899px) { .adm-side { flex-direction: row; flex-wrap: wrap; align-items: center; padding: 12px max(16px, env(safe-area-inset-left, 0px)); } }
+.adm-logo { font-weight: 500; letter-spacing: .28em; font-size: 18px; }
+.adm-logo small { display: block; letter-spacing: .06em; font-size: 12px; color: var(--on-ink-muted); }
+.adm-nav { display: flex; flex-direction: column; gap: 4px; }
+@media (max-width: 899px) { .adm-nav { flex-direction: row; overflow-x: auto; width: 100%; order: 3; } }
+.adm-nav a { text-decoration: none; color: var(--on-ink-muted); padding: 9px 12px; border-radius: 8px; white-space: nowrap; }
+.adm-nav a:hover { background: #1E1D1B; color: #fff; }
+.adm-nav a[aria-current="page"] { background: #2A2825; color: #fff; }
+.adm-user { margin-top: auto; font-size: 13px; color: var(--on-ink-muted); display: grid; gap: 8px; }
+@media (max-width: 899px) { .adm-user { margin: 0 0 0 auto; display: flex; align-items: center; } }
+.adm-user button { background: none; border: 1px solid #4A4640; color: var(--on-ink); border-radius: 8px; padding: 6px 10px; font-size: 13px; }
+.adm-main { padding: 26px max(16px, env(safe-area-inset-right, 0px)) 60px max(16px, env(safe-area-inset-left, 0px)); min-width: 0; }
+@media (min-width: 900px) { .adm-main { padding: 32px 36px 60px; } }
+.adm-main h1 { font: 400 clamp(34px, 5vw, 48px)/1 var(--display); text-transform: uppercase; margin-bottom: 6px; }
+.adm-sub { color: var(--muted); margin-bottom: 24px; }
+.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 14px; margin-bottom: 28px; }
+.kpi { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 16px; }
+.kpi b { display: block; font: 400 34px/1.05 var(--display); font-variant-numeric: tabular-nums; }
+.kpi span { color: var(--muted); font-size: 13.5px; }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 18px; margin-bottom: 18px; }
+.panel h2 { font-size: 16px; font-weight: 600; margin-bottom: 12px; }
+.tbl-wrap { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; }
+.tbl { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+.tbl th { text-align: left; font-size: 12.5px; letter-spacing: .04em; color: var(--muted); font-weight: 600; padding: 11px 14px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+.tbl td { padding: 12px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+.tbl tr:last-child td { border-bottom: 0; }
+.tbl a { font-weight: 600; }
+.tbl .num { text-align: right; white-space: nowrap; }
+.pill { display: inline-block; font-size: 12.5px; font-weight: 600; padding: 3px 10px; border-radius: 999px; white-space: nowrap; }
+.st-nuevo { background: #FBE3DE; color: #9C2B18; }
+.st-confirmado { background: #FBEFD5; color: #7A5410; }
+.st-pagado { background: #E1F0FA; color: #1B5E87; }
+.st-enviado { background: #EAE4F7; color: #4F3A8C; }
+.st-entregado { background: #DEF2E6; color: #18663A; }
+.st-cancelado { background: #EAE8E4; color: #5F5B53; text-decoration: line-through; }
+.filters { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px; }
+.filters a { text-decoration: none; padding: 7px 13px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); font-size: 14px; }
+.filters a[aria-current="page"] { background: var(--ink); color: var(--on-ink); border-color: var(--ink); }
+.fgrid { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); }
+.field { display: grid; gap: 5px; font-size: 13.5px; font-weight: 600; }
+.field input, .field textarea, .field select { width: 100%; padding: 10px 12px; border: 1.5px solid var(--line); border-radius: 8px; background: var(--bg); font-weight: 400; font-size: 15px; }
+.field textarea { min-height: 64px; resize: vertical; }
+.check { display: flex; gap: 8px; align-items: center; font-weight: 500; }
+.check input { width: 18px; height: 18px; accent-color: var(--red); }
+.abtn { background: var(--ink); color: var(--on-ink); border: 0; border-radius: 8px; padding: 10px 16px; font-weight: 600; }
+.abtn.red { background: var(--red); color: #fff; }
+.abtn.ghost { background: transparent; color: var(--text); border: 1.5px solid var(--line); }
+@media (prefers-color-scheme: dark) { .abtn { background: var(--on-ink); color: var(--ink); } .st-cancelado { background: #2A2825; color: #A9A398; } }
+.vrow { display: grid; grid-template-columns: minmax(0, 1fr) 110px auto; gap: 12px; align-items: end; padding: 10px 0; border-top: 1px solid var(--line); }
+.status-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.status-row button { border: 1.5px solid var(--line); background: var(--surface); border-radius: 999px; padding: 7px 14px; font-weight: 500; }
+.status-row button[aria-pressed="true"] { background: var(--ink); color: var(--on-ink); border-color: var(--ink); }
+.dl { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 8px 18px; }
+.dl dt { color: var(--muted); }
+.dl dd { margin: 0; overflow-wrap: anywhere; }
+.ok-msg { color: var(--ok); font-weight: 600; font-size: 14px; }
+.low { color: var(--danger); font-weight: 600; }
+
+/* login */
+.login { min-height: 100vh; display: grid; place-items: center; background: var(--ink); padding: 24px max(16px, env(safe-area-inset-left, 0px)); }
+.login form { width: min(400px, 100%); background: var(--surface); border-radius: 16px; padding: 28px; display: grid; gap: 14px; }
+.login h1 { font: 400 40px/1 var(--display); text-transform: uppercase; }
+.login p { color: var(--muted); font-size: 14.5px; }
+.demo { background: var(--bg); border: 1px dashed var(--line); border-radius: 10px; padding: 10px 12px; font-size: 13.5px; color: var(--muted); }
