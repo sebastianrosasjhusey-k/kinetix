@@ -1,0 +1,1287 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Kinetix C-PRIX</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Fira+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: banda negra de marca + contenido claro; tres vistas enrutadas por hash */
+:root{--bg:#F6F3EC;--surface:#FFFFFF;--text:#141414;--muted:#5F5B53;--line:#DDD8CC;--red:#D63B27;--gold:#D9A62E;--ink:#0D0D0D;--on-ink:#F6F3EC;--on-ink-muted:#CFCAC0}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121212;--surface:#1D1D1D;--text:#F2EEE6;--muted:#A9A398;--line:#33312D;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#121212;--surface:#1D1D1D;--text:#F2EEE6;--muted:#A9A398;--line:#33312D;color-scheme:dark}
+*{box-sizing:border-box;margin:0}
+body{background:var(--bg);color:var(--text);font:400 17px/1.55 "Fira Sans",Calibri,Arial,sans-serif}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:25;background:var(--ink)}
+button{font:inherit;color:inherit;cursor:pointer}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.disp{font-family:Anton,Impact,"Arial Narrow",sans-serif;font-weight:400;text-transform:uppercase;line-height:.95;text-wrap:balance}
+.pad{padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
+@media(min-width:900px){.pad{padding-left:max(4vw,env(safe-area-inset-left,0px));padding-right:max(4vw,env(safe-area-inset-right,0px))}}
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--ink);color:var(--on-ink);display:flex;flex-wrap:wrap;align-items:center;gap:10px 28px;padding-block:12px}
+.logo{font-weight:500;letter-spacing:.28em;font-size:20px;text-decoration:none;margin-right:auto}
+nav{display:flex;align-items:center;gap:8px;order:3;width:100%;overflow-x:auto;padding:6px}
+nav a{text-decoration:none;padding:11px 20px;border-radius:999px;font-size:17px;font-weight:500;white-space:nowrap;color:var(--on-ink-muted);transition:background .15s,color .15s,transform .15s}
+nav a:hover{color:#fff;background:#1E1D1B}
+nav a[aria-current="page"]{background:#2A2825;color:#fff}
+/* Tienda: botón principal destacado del menú */
+nav a.nav-shop{background:var(--gold);color:var(--ink);font-weight:600;padding:12px 26px;font-size:18px;letter-spacing:.02em;box-shadow:0 4px 14px rgba(217,166,46,.35)}
+nav a.nav-shop:hover{background:#E8B83F;color:var(--ink);transform:translateY(-1px)}
+nav a.nav-shop[aria-current="page"]{background:var(--gold);color:var(--ink);box-shadow:0 0 0 3px var(--ink),0 0 0 5px var(--gold)}
+.buy{background:var(--red);color:#fff;border:0;font-weight:600;padding:8px 10px 8px 16px;border-radius:999px;order:2;display:flex;gap:8px;align-items:center}
+.buy b{background:#fff;color:var(--red);border-radius:999px;min-width:24px;height:24px;display:grid;place-items:center;font-size:13px;font-variant-numeric:tabular-nums}
+/* tienda */
+.s-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,290px),1fr));gap:22px;margin-top:30px}
+.s-card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:18px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.s-pic{background:var(--bg);border-radius:12px;display:grid;place-items:center;padding:16px}
+.s-pic svg{width:min(150px,50%);height:auto;filter:drop-shadow(0 10px 14px rgba(0,0,0,.22))}
+.s-card h3{font-size:30px}.s-card p{color:var(--muted);font-size:15px}
+.s-chips{display:flex;gap:8px;flex-wrap:wrap}
+.s-chip{border:1.5px solid var(--line);background:transparent;border-radius:999px;padding:6px 14px;font-size:14px;display:flex;align-items:center;gap:7px}
+.s-chip i{width:12px;height:12px;border-radius:50%;display:block}
+.s-chip[aria-pressed="true"],.s-chip.fixed{border-color:var(--text);font-weight:600}
+.s-warn{font-size:12.5px;color:var(--muted)}
+.s-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:auto}
+.s-price{font-size:26px;font-weight:600;font-variant-numeric:tabular-nums}.s-price s{font-size:14px;color:var(--muted);font-weight:400;margin-left:6px}
+.s-qty{display:inline-flex;align-items:center;border:1.5px solid var(--line);border-radius:999px}
+.s-qty button{background:none;border:0;width:36px;height:36px;font-size:20px;line-height:1}
+.s-qty span{min-width:24px;text-align:center;font-weight:600;font-variant-numeric:tabular-nums}
+.s-add{width:100%;background:var(--ink);color:var(--on-ink);border:0;border-radius:12px;padding:13px;font-weight:600}
+.s-add:hover{background:var(--red);color:#fff}
+.scrim{position:fixed;inset:0;background:rgba(0,0,0,.5);opacity:0;pointer-events:none;transition:opacity .2s;z-index:40}
+.scrim.on{opacity:1;pointer-events:auto}
+#cart{position:fixed;top:0;right:0;bottom:0;width:min(440px,100%);background:var(--surface);z-index:50;transform:translateX(100%);transition:transform .25s;display:flex;flex-direction:column;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);padding-right:env(safe-area-inset-right,0px)}
+#cart.on{transform:none}
+.c-head{display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid var(--line)}
+.c-head h2{font-size:30px}.c-x{background:none;border:0;font-size:30px;line-height:1;width:44px;height:44px}
+.c-items{padding:6px 20px;overflow:auto;flex:1}
+.c-it{display:flex;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
+.c-it svg{width:38px;flex:none}.c-n{flex:1;min-width:0;font-weight:600;line-height:1.25}.c-n small{display:block;color:var(--muted);font-weight:400}
+.c-empty{color:var(--muted);padding:28px 0}
+.c-pay{padding:16px 20px;border-top:1px solid var(--line);display:grid;gap:10px}
+.c-pay input{width:100%;padding:12px 14px;border:1.5px solid var(--line);border-radius:10px;background:var(--bg);color:var(--text);font:inherit}
+.c-tot{display:flex;justify-content:space-between;font-size:20px;font-weight:600;font-variant-numeric:tabular-nums}
+.c-send{display:block;text-align:center;text-decoration:none;background:#1FA855;color:#fff;font-weight:600;border-radius:12px;padding:14px}
+.c-send[aria-disabled="true"]{background:var(--line);color:var(--muted);pointer-events:none}
+.c-note{font-size:12.5px;color:var(--muted)}
+.c-bar{position:fixed;left:max(12px,env(safe-area-inset-left,0px));right:max(12px,env(safe-area-inset-right,0px));bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:30;background:var(--red);color:#fff;border:0;border-radius:14px;padding:14px 18px;justify-content:space-between;font-weight:600;box-shadow:0 8px 24px rgba(0,0,0,.3);display:flex}
+@media(min-width:900px){.c-bar{left:auto;width:340px;right:24px}}
+@media(min-width:760px){nav{order:2;width:auto}.buy{order:3}}
+.page{display:none}.page.on{display:block}
+.dark{background:var(--ink);color:var(--on-ink)}
+.btn{display:inline-block;text-decoration:none;font-weight:600;border-radius:999px;padding:14px 26px}
+.b1{background:var(--gold);color:#111}.b2{border:1.5px solid #6b665d;color:#fff}
+h2.disp{font-size:clamp(36px,6.5vw,68px)}
+section{padding-block:clamp(44px,7vw,84px)}
+.lead{color:var(--muted);max-width:36em;margin-top:14px}
+.dark .lead{color:var(--on-ink-muted)}
+.hero{display:grid;gap:36px;align-items:center;overflow:hidden}
+@media(min-width:860px){.hero{grid-template-columns:1.15fr .85fr}}
+.hero>div{min-width:0}
+.hero h1{font-size:clamp(56px,11vw,128px)}
+.hero p{max-width:30em;margin:20px 0 28px;color:var(--on-ink-muted)}
+.cta{display:flex;gap:12px;flex-wrap:wrap}
+.pouches{position:relative;height:340px;display:flex;justify-content:center;align-items:center}
+.pouches::before{content:"";position:absolute;width:min(300px,80%);aspect-ratio:1;border-radius:50%;background:var(--red);right:0;top:20px}
+.pouches::after{content:"";position:absolute;width:52px;height:52px;border-radius:50%;background:var(--gold);left:20px;top:30px}
+.pouches svg{position:relative;width:min(170px,42%);filter:drop-shadow(0 14px 18px rgba(0,0,0,.5))}
+.pouches svg:first-child{transform:rotate(-6deg)}
+.pouches svg+svg{margin-left:-34px;transform:rotate(7deg) translateY(16px)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:20px;background:var(--red);color:#fff;padding-block:34px}
+.stats strong{display:block;font:400 clamp(40px,6vw,64px)/1 Anton,Impact,sans-serif;font-variant-numeric:tabular-nums}
+.stats span{font-size:15px}
+.ben{margin-top:36px;border-top:2px solid var(--text)}
+.ben div{display:grid;gap:6px 40px;padding-block:22px;border-bottom:1px solid var(--line)}
+@media(min-width:760px){.ben div{grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);align-items:baseline}}
+.ben h3{font-size:clamp(26px,3.6vw,38px)}
+.ben p{color:var(--muted);max-width:40em}
+.two{display:grid;gap:28px}
+@media(min-width:860px){.two{grid-template-columns:1fr 1fr}}
+.sports{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px}
+.sports span{border:1.5px solid var(--on-ink-muted);border-radius:999px;padding:7px 16px;font-weight:500}
+.line{display:grid;gap:18px;margin-top:30px}
+@media(min-width:760px){.line{grid-template-columns:repeat(3,1fr)}}
+.line div{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px}
+.line h3{font-size:28px;margin-bottom:6px}.line p{color:var(--muted);font-size:15.5px}
+.note{font-size:13.5px;color:var(--muted);max-width:46em;margin-top:22px}
+.steps{display:grid;gap:22px;margin-top:34px}
+@media(min-width:760px){.steps{grid-template-columns:repeat(3,1fr)}}
+.steps div{border-top:2px solid var(--text);padding-top:14px}
+.steps b{font:400 64px/1 Anton,Impact,sans-serif;color:var(--red);display:block}
+.steps h3{font-size:28px;margin:4px 0 6px}.steps p{color:var(--muted)}
+.doses{display:grid;gap:18px;margin-top:30px}
+@media(min-width:760px){.doses{grid-template-columns:1fr 1fr}}
+.dose{border-radius:16px;padding:26px;background:var(--surface);border:1px solid var(--line)}
+.dose.k{background:var(--ink);color:var(--on-ink);border-color:var(--ink)}
+.dose h3{font-size:clamp(34px,5vw,50px)}
+.dose dl{display:flex;gap:30px;margin-top:16px}
+.dose dd{font:400 36px/1 Anton,Impact,sans-serif;margin:0}.dose dt{font-size:14px;opacity:.75}
+.mini{margin-top:34px;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:24px;display:flex;flex-wrap:wrap;gap:24px;align-items:center;justify-content:space-between}
+.mini h3{font-size:30px}.mini p{color:var(--muted);font-size:15px}
+.stepper{display:inline-flex;align-items:center;border:1.5px solid var(--line);border-radius:999px;margin-top:10px}
+.stepper button{background:none;border:0;width:44px;height:44px;font-size:22px}
+.stepper span{min-width:80px;text-align:center;font-weight:600}
+.out{display:flex;gap:34px}.out b{font:400 44px/1 Anton,Impact,sans-serif;display:block;font-variant-numeric:tabular-nums}.out i{font-style:normal;font-size:14px;color:var(--muted)}
+.tips{margin-top:34px;display:grid;gap:14px;max-width:46em}
+.tips p{padding-left:18px;position:relative}.tips p::before{content:"";position:absolute;left:0;top:.7em;width:8px;height:8px;background:var(--red);border-radius:2px}
+.calc{width:100%;border:0;display:block;min-height:900px;background:var(--bg)}
+footer{background:var(--ink);color:var(--on-ink-muted);font-size:14px;padding-block:32px;display:grid;gap:6px}
+footer b{color:#fff;font-weight:500;letter-spacing:.2em}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+</head>
+<body>
+<header class="pad">
+  <a class="logo" href="#inicio">KINETIX</a>
+  <nav aria-label="Principal">
+    <a href="#inicio">Beneficios</a><a href="#como-se-usa">Cómo se usa</a><a class="nav-shop" href="#tienda">Tienda</a><a href="#calculadora">Calculadora</a>
+  </nav>
+  <button class="buy" id="open" type="button" aria-label="Abrir pedido">Pedido <b id="cnt">0</b></button>
+</header>
+
+<div class="page" id="p-inicio">
+  <section class="dark pad hero">
+    <div>
+      <h1 class="disp">Energía para ir más lejos.</h1>
+      <p>C-PRIX reúne carbohidratos y sodio en un solo polvo que se mezcla en tu bidón. Hecho en Perú para correr, nadar y pedalear sin armar combinaciones por tu cuenta.</p>
+      <div class="cta"><a class="btn b1" href="#tienda">Comprar C-PRIX</a><a class="btn b2" href="#calculadora">Calcula tu plan</a></div>
+    </div>
+    <div class="pouches" id="pouches" aria-hidden="true"></div>
+  </section>
+
+  <section class="stats pad">
+    <div><strong>25 g</strong><span>de carbohidratos por scoop</span></div>
+    <div><strong>200 mg</strong><span>de sodio por scoop</span></div>
+    <div><strong>1:0.8</strong><span>maltodextrina + fructosa</span></div>
+    <div><strong>34</strong><span>porciones por bolsa de 900 g</span></div>
+  </section>
+
+  <section class="pad">
+    <h2 class="disp">Todo lo que tiene tu bidón</h2>
+    <p class="lead">Siete razones por las que C-PRIX se mezcla, se toma y se repite.</p>
+    <div class="ben">
+      <div><h3 class="disp">Energía y sodio en una mezcla</h3><p>Un solo polvo con carbohidratos y electrolitos, listo para entrenamientos y competencias. Sin combinar productos ni hacer cuentas.</p></div>
+      <div><h3 class="disp">Sodio de sal rosada amazónica</h3><p>No es solo cloruro de sodio: C-PRIX usa sal rosada amazónica, con mayor valor nutricional.</p></div>
+      <div><h3 class="disp">Aporte completo por porción</h3><p>Cada scoop trae 25 g de carbohidratos y 200 mg de sodio. Con 2 scoops son 50 g y 400 mg. Para una persona promedio no hace falta agregar más sodio.</p></div>
+      <div><h3 class="disp">Sin apelmazamiento</h3><p>Los insumos están tamizados al mismo gramaje, así que la mezcla con agua no deja grumos en el fondo de la botella.</p></div>
+      <div><h3 class="disp">Sabores suaves</h3><p>Naranja y Frutos Rojos. No empalagan, ni siquiera en dosis altas.</p></div>
+      <div><h3 class="disp">Precio competitivo</h3><p>Acorde al mercado. La bolsa de 900 g rinde 34 porciones, con precio de lanzamiento de S/ 95.</p></div>
+      <div><h3 class="disp">Formato en polvo</h3><p>Se prepara en el bidón con la cantidad de agua que prefieras. Tú decides cuánto llevas.</p></div>
+    </div>
+  </section>
+
+  <section class="pad dark">
+    <div class="two">
+      <div>
+        <h2 class="disp">Hecho por un equipo especializado</h2>
+        <p class="lead">Desarrollado por Kinetix, con un equipo dedicado a la investigación de producto. Fabricado y controlado en nuestra planta de La Molina.</p>
+      </div>
+      <div>
+        <h2 class="disp" style="font-size:clamp(30px,4.5vw,46px)">Para quién es</h2>
+        <p class="lead">Para deportes de endurance y cualquier otro que requiera carbohidratos y electrolitos para mantener el rendimiento. Se usa durante el entrenamiento y la competencia.</p>
+        <div class="sports"><span>Running</span><span>Triatlón</span><span>Natación</span><span>Aguas abiertas</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="pad">
+    <h2 class="disp">Una línea que se complementa</h2>
+    <div class="line">
+      <div><h3 class="disp">C-PRIX</h3><p>Carbohidratos + electrolitos. Naranja y Frutos Rojos. 900 g, 34 porciones.</p></div>
+      <div><h3 class="disp">HYD-PRIX</h3><p>Electrolitos en polvo con sabor natural, Maracumango y Limón. Sin colorantes. 100 g, 33 porciones.</p></div>
+      <div><h3 class="disp">RAW</h3><p>Electrolitos sin sabor, ideales para mezclar con C-PRIX si sudas muy intensamente. 100 g, 33 porciones.</p></div>
+    </div>
+    <p class="note">C-PRIX lleva las advertencias “Alto en azúcar” y “Alto en sodio” que exige la normativa peruana. Si tienes una condición médica o una restricción de sodio, consulta a un profesional antes de usarlo.</p>
+  </section>
+
+  <section class="pad dark">
+    <h2 class="disp">Prepara tu próxima salida</h2>
+    <div class="cta" style="margin-top:24px"><a class="btn b1" href="#tienda">Comprar C-PRIX</a><a class="btn b2" href="#como-se-usa">Ver cómo se usa</a></div>
+  </section>
+</div>
+
+<div class="page" id="p-como-se-usa">
+  <section class="pad dark">
+    <h2 class="disp" style="font-size:clamp(48px,9vw,104px)">Así se usa C-PRIX</h2>
+    <p class="lead">Tres pasos en el bidón. La cantidad exacta depende de ti y de tu actividad.</p>
+  </section>
+  <section class="pad">
+    <div class="steps">
+      <div><b>1</b><h3 class="disp">Mezcla</h3><p>Echa el agua y los scoops en tu bidón. Cada scoop pesa unos 26 g.</p></div>
+      <div><b>2</b><h3 class="disp">Agita</h3><p>Los insumos están tamizados al mismo gramaje, así que se disuelve sin dejar grumos.</p></div>
+      <div><b>3</b><h3 class="disp">Disfruta</h3><p>Tómalo durante el entrenamiento o la competencia para sostener tu energía.</p></div>
+    </div>
+    <h2 class="disp" style="margin-top:64px">Dos dosis de base</h2>
+    <div class="doses">
+      <div class="dose"><h3 class="disp">500 ml + 2 scoops</h3><dl><div><dd>50 g</dd><dt>carbohidratos</dt></div><div><dd>400 mg</dd><dt>sodio</dt></div></dl></div>
+      <div class="dose k"><h3 class="disp">700 ml + 3 scoops</h3><dl><div><dd>75 g</dd><dt>carbohidratos</dt></div><div><dd>600 mg</dd><dt>sodio</dt></div></dl></div>
+    </div>
+    <div class="mini">
+      <div><h3 class="disp">Prueba otra cantidad</h3><p>Elige cuántos scoops quieres y mira cuánto aportan.</p>
+        <div class="stepper"><button id="m" type="button" aria-label="Menos scoops">−</button><span id="sc" aria-live="polite">2 scoops</span><button id="pl" type="button" aria-label="Más scoops">+</button></div></div>
+      <div class="out"><div><b id="oc">50 g</b><i>carbohidratos</i></div><div><b id="on">400 mg</b><i>sodio</i></div></div>
+    </div>
+    <div class="tips">
+      <p>La cantidad varía según la persona y la actividad. Para un plan a tu medida, usa la <a href="#calculadora"><b>calculadora</b></a>.</p>
+      <p>Si sudas de forma muy intensa, puedes sumar RAW, los electrolitos en polvo pensados para mezclarse con C-PRIX.</p>
+      <p>Guárdalo en un lugar fresco y seco, protegido de la luz solar directa, y mantén el envase cerrado.</p>
+      <p>Si tienes indicaciones médicas o restricción de sodio, ajusta la dosis con un profesional.</p>
+    </div>
+  </section>
+</div>
+
+<div class="page" id="p-calculadora">
+  <section class="pad dark" style="padding-bottom:36px">
+    <h2 class="disp" style="font-size:clamp(48px,9vw,104px)">Calcula tu plan</h2>
+    <p class="lead">Cuánto líquido, sodio y carbohidrato por hora según tu peso, tu sudor y el clima, traducido a scoops en cada bidón. Ya trae cargados los valores de la etiqueta de C-PRIX y RAW.</p>
+  </section>
+  <iframe class="calc" id="calc" title="Calculadora de plan de carrera Kinetix" srcdoc="&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;es&quot;&gt;
+&lt;head&gt;
+&lt;meta charset=&quot;UTF-8&quot;&gt;
+&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;
+&lt;title&gt;Kinetix · Plan de carrera&lt;/title&gt;
+&lt;link rel=&quot;preconnect&quot; href=&quot;https://fonts.googleapis.com&quot;&gt;
+&lt;link rel=&quot;preconnect&quot; href=&quot;https://fonts.gstatic.com&quot; crossorigin&gt;
+&lt;link href=&quot;https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;800&amp;family=Archivo+Narrow:wght@600;700&amp;family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&amp;display=swap&quot; rel=&quot;stylesheet&quot;&gt;
+&lt;style&gt;
+:root{
+  --paper:#E9EDE6;
+  --card:#FFFFFF;
+  --ink:#12201B;
+  --ink-soft:#4A5A53;
+  --line:#C8D2C8;
+  --marine:#0F4046;
+  --marine-2:#16565D;
+  --hivis:#CDF24F;
+  --alert:#B23A22;
+  --alert-bg:#FBE9E4;
+  --ok:#2A6B4F;
+  --radius:4px;
+  --radius-lg:10px;
+  --fs-data:&quot;Archivo Narrow&quot;,&quot;Archivo&quot;,system-ui,sans-serif;
+  --fs-ui:&quot;Archivo&quot;,system-ui,-apple-system,&quot;Segoe UI&quot;,sans-serif;
+  --fs-prose:&quot;Newsreader&quot;,Georgia,&quot;Times New Roman&quot;,serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme=&quot;light&quot;]){
+    --paper:#0C1613;
+    --card:#132019;
+    --ink:#E6EDE5;
+    --ink-soft:#9DAFA4;
+    --line:#2A3C33;
+    --marine:#0C3238;
+    --marine-2:#14474E;
+    --hivis:#CDF24F;
+    --alert:#F08C6E;
+    --alert-bg:#341B14;
+    --ok:#7FD0A6;
+  }
+}
+:root[data-theme=&quot;dark&quot;]{
+  --paper:#0C1613;
+  --card:#132019;
+  --ink:#E6EDE5;
+  --ink-soft:#9DAFA4;
+  --line:#2A3C33;
+  --marine:#0C3238;
+  --marine-2:#14474E;
+  --hivis:#CDF24F;
+  --alert:#F08C6E;
+  --alert-bg:#341B14;
+  --ok:#7FD0A6;
+}
+
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+[hidden]{display:none !important}
+body{
+  margin:0;
+  background:var(--paper);
+  color:var(--ink);
+  font-family:var(--fs-ui);
+  font-size:16px;
+  line-height:1.45;
+}
+img{max-width:100%}
+:focus-visible{outline:3px solid var(--marine-2);outline-offset:2px;border-radius:2px}
+@media (prefers-color-scheme: dark){:root:not([data-theme=&quot;light&quot;]) :focus-visible{outline-color:var(--hivis)}}
+
+.wrap{max-width:1180px;margin:0 auto;padding:0 20px}
+
+/* ---------- cabecera ---------- */
+.top{
+  background:var(--marine);
+  color:#EAF3EC;
+  padding:26px 0 30px;
+  border-bottom:6px solid var(--hivis);
+}
+.top .wrap{display:flex;flex-wrap:wrap;gap:22px;align-items:flex-end;justify-content:space-between}
+.brand{font-family:var(--fs-data);font-weight:700;font-size:clamp(38px,7vw,64px);letter-spacing:-.02em;line-height:.92;margin:0}
+.brand span{display:block;font-family:var(--fs-ui);font-weight:400;font-size:15px;letter-spacing:.01em;opacity:.85;margin-top:10px;max-width:46ch;line-height:1.4}
+.top-note{font-family:var(--fs-prose);font-size:15.5px;max-width:34ch;opacity:.9;margin:0}
+.theme-btn{
+  background:transparent;border:1px solid rgba(234,243,236,.35);color:inherit;
+  font-family:var(--fs-ui);font-size:13px;padding:6px 11px;border-radius:99px;cursor:pointer;
+}
+.theme-btn:hover{border-color:var(--hivis)}
+
+/* ---------- layout ---------- */
+.grid{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);gap:26px;padding:28px 0 60px;align-items:start}
+@media (max-width:900px){.grid{grid-template-columns:1fr;gap:20px}}
+
+.panel{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:var(--radius-lg);
+  padding:20px 20px 22px;
+  margin-bottom:18px;
+}
+.panel h2{
+  font-size:13.5px;font-weight:800;letter-spacing:.02em;margin:0 0 4px;
+}
+.panel .sub{font-family:var(--fs-prose);font-size:15px;color:var(--ink-soft);margin:0 0 16px;max-width:58ch}
+
+.field{margin-bottom:15px}
+.field:last-child{margin-bottom:0}
+label,.lab{display:block;font-size:13px;font-weight:600;margin-bottom:6px}
+.hint{font-family:var(--fs-prose);font-size:14px;color:var(--ink-soft);margin-top:5px;line-height:1.35}
+
+input[type=&quot;number&quot;],select,input[type=&quot;text&quot;]{
+  width:100%;padding:9px 11px;font-family:var(--fs-ui);font-size:15px;
+  background:var(--paper);color:var(--ink);
+  border:1px solid var(--line);border-radius:var(--radius);
+}
+.row{display:flex;gap:12px;flex-wrap:wrap}
+.row&gt;*{flex:1 1 150px;min-width:0}
+
+.chips{display:flex;flex-wrap:wrap;gap:7px}
+.chip{
+  font-family:var(--fs-ui);font-size:13.5px;font-weight:600;
+  padding:7px 12px;border-radius:99px;cursor:pointer;
+  background:var(--paper);color:var(--ink);border:1px solid var(--line);
+}
+.chip:hover{border-color:var(--marine-2)}
+.chip[aria-pressed=&quot;true&quot;]{background:var(--marine);color:#EAF3EC;border-color:var(--marine)}
+.chip small{display:block;font-weight:400;font-size:11.5px;opacity:.75}
+
+input[type=&quot;range&quot;]{width:100%;accent-color:var(--marine-2)}
+.range-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.range-val{font-family:var(--fs-data);font-weight:700;font-size:22px}
+
+/* ---------- tarjeta del plan (pegatina de tubo superior) ---------- */
+.sticky-col{position:sticky;top:18px}
+@media (max-width:900px){.sticky-col{position:static}}
+
+.sticker{
+  background:var(--marine);color:#EAF3EC;border-radius:var(--radius-lg);
+  overflow:hidden;border:1px solid var(--marine);
+}
+.sticker-head{padding:16px 18px 14px;border-bottom:1px dashed rgba(234,243,236,.28)}
+.sticker-head h2{margin:0;font-size:13px;font-weight:800;letter-spacing:.02em}
+.sticker-head p{margin:3px 0 0;font-family:var(--fs-prose);font-size:14.5px;opacity:.85}
+
+.dials{display:grid;grid-template-columns:repeat(3,1fr);border-bottom:1px dashed rgba(234,243,236,.28)}
+.dial{padding:14px 10px 16px;text-align:center;border-right:1px dashed rgba(234,243,236,.28)}
+.dial:last-child{border-right:0}
+.dial b{display:block;font-family:var(--fs-data);font-weight:700;font-size:clamp(28px,5.4vw,40px);line-height:1;letter-spacing:-.01em}
+.dial i{font-style:normal;font-size:12.5px;opacity:.8;display:block;margin-top:6px}
+.dial.hot b{color:var(--hivis)}
+
+.segs{padding:4px 0}
+.seg{padding:12px 18px;border-bottom:1px dashed rgba(234,243,236,.2)}
+.seg:last-child{border-bottom:0}
+.seg-top{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.seg-top b{font-size:14.5px}
+.seg-top span{font-family:var(--fs-data);font-size:15px;opacity:.85}
+.seg-body{font-family:var(--fs-prose);font-size:15px;opacity:.92;margin-top:5px;line-height:1.4}
+.seg-scoops{margin-top:8px;display:flex;flex-wrap:wrap;gap:6px}
+.pill{
+  font-family:var(--fs-data);font-weight:700;font-size:13.5px;
+  background:rgba(205,242,79,.14);color:var(--hivis);
+  border:1px solid rgba(205,242,79,.4);border-radius:99px;padding:3px 10px;
+}
+.pill.water{background:rgba(234,243,236,.1);color:#EAF3EC;border-color:rgba(234,243,236,.3)}
+
+.bar{display:flex;gap:10px;padding:14px 18px;background:var(--marine-2);flex-wrap:wrap}
+.btn{
+  font-family:var(--fs-ui);font-weight:600;font-size:14px;cursor:pointer;
+  padding:9px 15px;border-radius:99px;border:1px solid transparent;
+}
+.btn-main{background:var(--hivis);color:#12201B}
+.btn-main:hover{filter:brightness(1.06)}
+.btn-ghost{background:transparent;color:#EAF3EC;border-color:rgba(234,243,236,.4)}
+.btn-ghost:hover{border-color:var(--hivis)}
+
+/* ---------- avisos ---------- */
+.warns{margin-top:14px;display:grid;gap:8px}
+.warn{
+  display:flex;gap:10px;align-items:flex-start;
+  background:var(--alert-bg);color:var(--alert);
+  border-left:3px solid currentColor;border-radius:0 var(--radius) var(--radius) 0;
+  padding:10px 12px;font-size:14.5px;font-family:var(--fs-prose);line-height:1.4;
+}
+.warn.good{background:transparent;color:var(--ok);border-color:var(--ok)}
+.warn b{font-family:var(--fs-ui);font-size:13px;font-weight:800;display:block}
+
+/* ---------- tablas ---------- */
+.tablewrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+table{width:100%;border-collapse:collapse;font-size:14.5px;min-width:440px}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line)}
+th{font-size:12.5px;font-weight:800;color:var(--ink-soft)}
+td b{font-family:var(--fs-data);font-size:16px}
+tr:last-child td{border-bottom:0}
+
+details{border-top:1px solid var(--line);padding-top:12px;margin-top:6px}
+summary{cursor:pointer;font-size:13.5px;font-weight:600}
+details[open] summary{margin-bottom:12px}
+
+.prose{font-family:var(--fs-prose);font-size:16px;line-height:1.55;max-width:62ch;color:var(--ink-soft)}
+.prose strong{color:var(--ink)}
+footer{border-top:1px solid var(--line);padding:26px 0 48px;font-family:var(--fs-prose);font-size:14.5px;color:var(--ink-soft)}
+footer .wrap{max-width:70ch}
+
+.saved{font-size:13px;color:var(--ok);min-height:18px;display:block;margin-top:8px}
+
+/* ---------- impresión: solo la pegatina ---------- */
+@media print{
+  body{background:#fff}
+  .top,.col-left,.bar,footer,.no-print{display:none !important}
+  .grid{display:block;padding:0}
+  .sticker{border:1px solid #000;color:#000;background:#fff}
+  .sticker-head,.dials,.seg{border-color:#999 !important}
+  .pill{color:#000;border-color:#000;background:#fff}
+  .dial.hot b{color:#000}
+}
+@media (prefers-reduced-motion: reduce){*{animation:none !important;transition:none !important}}
+#printBtn{display:none!important}.top{display:none}
+&lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+
+&lt;header class=&quot;top&quot;&gt;
+  &lt;div class=&quot;wrap&quot;&gt;
+    &lt;h1 class=&quot;brand&quot;&gt;KINETIX
+      &lt;span&gt;Cuánto tomar, cuánto sodio y cuántos gramos de carbohidrato por hora — calculado con tu peso, tu sudor y el clima del día, y traducido a cucharadas dentro de cada bidón.&lt;/span&gt;
+    &lt;/h1&gt;
+    &lt;div&gt;
+      &lt;p class=&quot;top-note&quot;&gt;Protocolo RAW + C-Prix para triatlón. Ajusta arriba a la izquierda, lee el plan a la derecha, imprímelo y pégalo en el tubo superior.&lt;/p&gt;
+      &lt;button class=&quot;theme-btn no-print&quot; id=&quot;themeBtn&quot; type=&quot;button&quot;&gt;Cambiar contraste&lt;/button&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/header&gt;
+
+&lt;main class=&quot;wrap grid&quot;&gt;
+
+  &lt;!-- ============ COLUMNA IZQUIERDA: ENTRADAS ============ --&gt;
+  &lt;div class=&quot;col-left&quot;&gt;
+
+    &lt;section class=&quot;panel&quot;&gt;
+      &lt;h2&gt;Tú&lt;/h2&gt;
+      &lt;p class=&quot;sub&quot;&gt;El sudor es personal: entre dos triatletas del mismo peso hay el triple de diferencia en pérdidas de sodio. Sin estos datos, cualquier calculadora está adivinando.&lt;/p&gt;
+
+      &lt;div class=&quot;row&quot;&gt;
+        &lt;div class=&quot;field&quot;&gt;
+          &lt;label for=&quot;peso&quot;&gt;Peso corporal (kg)&lt;/label&gt;
+          &lt;input type=&quot;number&quot; id=&quot;peso&quot; min=&quot;35&quot; max=&quot;130&quot; step=&quot;0.5&quot; value=&quot;72&quot;&gt;
+        &lt;/div&gt;
+        &lt;div class=&quot;field&quot;&gt;
+          &lt;label for=&quot;sudorMedido&quot;&gt;Tasa de sudor medida (ml/h)&lt;/label&gt;
+          &lt;input type=&quot;number&quot; id=&quot;sudorMedido&quot; min=&quot;0&quot; max=&quot;3000&quot; step=&quot;50&quot; placeholder=&quot;opcional&quot;&gt;
+          &lt;p class=&quot;hint&quot;&gt;Si la dejas vacía, la estimo. Mídela con la prueba de abajo: es el dato que más cambia el plan.&lt;/p&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+
+      &lt;div class=&quot;field&quot;&gt;
+        &lt;span class=&quot;lab&quot;&gt;Sal en el sudor&lt;/span&gt;
+        &lt;div class=&quot;chips&quot; role=&quot;group&quot; id=&quot;salChips&quot;&gt;
+          &lt;button class=&quot;chip&quot; type=&quot;button&quot; data-v=&quot;bajo&quot;&gt;Poca&lt;small&gt;Nunca veo sal&lt;/small&gt;&lt;/button&gt;
+          &lt;button class=&quot;chip&quot; type=&quot;button&quot; data-v=&quot;medio&quot; aria-pressed=&quot;true&quot;&gt;Media&lt;small&gt;Algo de cerco&lt;/small&gt;&lt;/button&gt;
+          &lt;button class=&quot;chip&quot; type=&quot;button&quot; data-v=&quot;alto&quot;&gt;Alta&lt;small&gt;Escuece en los ojos&lt;/small&gt;&lt;/button&gt;
+          &lt;button class=&quot;chip&quot; type=&quot;button&quot; data-v=&quot;muy&quot;&gt;Muy alta&lt;small&gt;Costra blanca, calambres&lt;/small&gt;&lt;/button&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+
+      &lt;div class=&quot;field&quot;&gt;
+        &lt;span class=&quot;lab&quot;&gt;Tolerancia digestiva a los carbohidratos&lt;/span&gt;
+        &lt;div class=&quot;chips&quot; role=&quot;group&quot; id=&quot;gutChips&quot;&gt;
+          &lt;button class=&quot;chip&quot; type=&quot;button&quot; data-v=&quot;60&quot;&gt;Sin entrenar&lt;small&gt;tope 60 g/h&lt;/small&gt;&lt;/button&gt;
+          &lt;button class=&quot;chip&quot; type=&quot;button&quot; data-v=&quot;90&quot; aria-pressed=&quot;true&quot;&gt;Entrenada&lt;small&gt;tope 90 g/h&lt;/small&gt;&lt;/button&gt;
+          &lt;button class=&quot;chip&quot; type=&quot;button&quot; data-v=&quot;120&quot;&gt;Muy entrenada&lt;small&gt;tope 120 g/h&lt;/small&gt;&lt;/button&gt;
+        &lt;/div&gt;
+        &lt;p class=&quot;hint&quot;&gt;Este techo es lo que tu intestino absorbe hoy, no lo que quema tu cuerpo. Se sube entrenando, no decidiéndolo el día de la carrera.&lt;/p&gt;
+      &lt;/div&gt;
+    &lt;/section&gt;
+
+    &lt;section class=&quot;panel&quot;&gt;
+      &lt;h2&gt;La sesión&lt;/h2&gt;
+      &lt;p class=&quot;sub&quot;&gt;Elige el escenario y ajusta duración y clima. En las distancias de competición el plan se parte por segmento, porque no se come igual sobre la bici que corriendo.&lt;/p&gt;
+
+      &lt;div class=&quot;field&quot;&gt;
+        &lt;span class=&quot;lab&quot;&gt;Escenario&lt;/span&gt;
+        &lt;div class=&quot;chips&quot; role=&quot;group&quot; id=&quot;presetChips&quot;&gt;&lt;/div&gt;
+      &lt;/div&gt;
+
+      &lt;div class=&quot;row&quot; id=&quot;runBlock&quot; hidden&gt;
+        &lt;div class=&quot;field&quot;&gt;
+          &lt;label for=&quot;dist&quot;&gt;Distancia (km)&lt;/label&gt;
+          &lt;input type=&quot;number&quot; id=&quot;dist&quot; min=&quot;1&quot; max=&quot;100&quot; step=&quot;0.5&quot; value=&quot;21.1&quot;&gt;
+        &lt;/div&gt;
+        &lt;div class=&quot;field&quot;&gt;
+          &lt;div class=&quot;range-head&quot;&gt;
+            &lt;label for=&quot;ritmo&quot;&gt;Ritmo objetivo&lt;/label&gt;
+            &lt;span class=&quot;range-val&quot; id=&quot;ritmoVal&quot;&gt;5:00 /km&lt;/span&gt;
+          &lt;/div&gt;
+          &lt;input type=&quot;range&quot; id=&quot;ritmo&quot; min=&quot;180&quot; max=&quot;480&quot; step=&quot;5&quot; value=&quot;300&quot;&gt;
+          &lt;p class=&quot;hint&quot; id=&quot;ritmoNota&quot;&gt;—&lt;/p&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+
+      &lt;div class=&quot;field&quot;&gt;
+        &lt;div class=&quot;range-head&quot;&gt;
+          &lt;label for=&quot;horas&quot;&gt;Duración total&lt;/label&gt;
+          &lt;span class=&quot;range-val&quot; id=&quot;horasVal&quot;&gt;4:00&lt;/span&gt;
+        &lt;/div&gt;
+        &lt;input type=&quot;range&quot; id=&quot;horas&quot; min=&quot;0.5&quot; max=&quot;17&quot; step=&quot;0.25&quot; value=&quot;4&quot;&gt;
+        &lt;p class=&quot;hint&quot; id=&quot;horasNota&quot; hidden&gt;La duración sale de distancia × ritmo. Cambia cualquiera de los dos arriba.&lt;/p&gt;
+      &lt;/div&gt;
+
+      &lt;div class=&quot;row&quot;&gt;
+        &lt;div class=&quot;field&quot;&gt;
+          &lt;div class=&quot;range-head&quot;&gt;
+            &lt;label for=&quot;temp&quot;&gt;Temperatura&lt;/label&gt;
+            &lt;span class=&quot;range-val&quot; id=&quot;tempVal&quot;&gt;22 °C&lt;/span&gt;
+          &lt;/div&gt;
+          &lt;input type=&quot;range&quot; id=&quot;temp&quot; min=&quot;2&quot; max=&quot;42&quot; step=&quot;1&quot; value=&quot;22&quot;&gt;
+        &lt;/div&gt;
+        &lt;div class=&quot;field&quot;&gt;
+          &lt;label for=&quot;hum&quot;&gt;Humedad&lt;/label&gt;
+          &lt;select id=&quot;hum&quot;&gt;
+            &lt;option value=&quot;0.95&quot;&gt;Seca (&amp;lt;40 %)&lt;/option&gt;
+            &lt;option value=&quot;1&quot; selected&gt;Normal (40–65 %)&lt;/option&gt;
+            &lt;option value=&quot;1.12&quot;&gt;Húmeda (65–85 %)&lt;/option&gt;
+            &lt;option value=&quot;1.22&quot;&gt;Tropical (&amp;gt;85 %)&lt;/option&gt;
+          &lt;/select&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+
+      &lt;div class=&quot;field&quot;&gt;
+        &lt;label for=&quot;inten&quot;&gt;Intensidad&lt;/label&gt;
+        &lt;select id=&quot;inten&quot;&gt;
+          &lt;option value=&quot;z2&quot;&gt;Z2 / conversacional&lt;/option&gt;
+          &lt;option value=&quot;tempo&quot; selected&gt;Tempo / ritmo firme&lt;/option&gt;
+          &lt;option value=&quot;carrera&quot;&gt;Competición / umbral&lt;/option&gt;
+        &lt;/select&gt;
+      &lt;/div&gt;
+
+      &lt;div class=&quot;field&quot;&gt;
+        &lt;span class=&quot;lab&quot;&gt;Tu equipo de botellas&lt;/span&gt;
+        &lt;div class=&quot;chips&quot; role=&quot;group&quot; id=&quot;bottleChips&quot;&gt;
+          &lt;button class=&quot;chip&quot; type=&quot;button&quot; data-v=&quot;1200,750&quot; aria-pressed=&quot;true&quot;&gt;1,2 L + 750 ml&lt;/button&gt;
+          &lt;button class=&quot;chip&quot; type=&quot;button&quot; data-v=&quot;500,500&quot;&gt;2 × 500 ml&lt;/button&gt;
+          &lt;button class=&quot;chip&quot; type=&quot;button&quot; data-v=&quot;500,750&quot;&gt;500 + 750 ml&lt;/button&gt;
+          &lt;button class=&quot;chip&quot; type=&quot;button&quot; data-v=&quot;250&quot;&gt;Solo un flask 250 ml&lt;/button&gt;
+          &lt;button class=&quot;chip&quot; type=&quot;button&quot; data-v=&quot;custom&quot;&gt;Personalizado&lt;/button&gt;
+        &lt;/div&gt;
+        &lt;div id=&quot;customBottles&quot; hidden style=&quot;margin-top:10px&quot;&gt;
+          &lt;div id=&quot;customBottleRows&quot;&gt;&lt;/div&gt;
+          &lt;button class=&quot;btn btn-ghost no-print&quot; id=&quot;addBottleBtn&quot; type=&quot;button&quot; style=&quot;margin-top:2px&quot;&gt;+ Añadir botella&lt;/button&gt;
+        &lt;/div&gt;
+        &lt;p class=&quot;hint&quot; id=&quot;bottleCapNota&quot;&gt;—&lt;/p&gt;
+      &lt;/div&gt;
+
+      &lt;div class=&quot;field&quot;&gt;
+        &lt;label for=&quot;ayunas&quot;&gt;&lt;input type=&quot;checkbox&quot; id=&quot;ayunas&quot; style=&quot;width:auto;margin-right:7px&quot;&gt; Sesión en ayunas (sin desayuno)&lt;/label&gt;
+      &lt;/div&gt;
+    &lt;/section&gt;
+
+    &lt;section class=&quot;panel&quot;&gt;
+      &lt;h2&gt;Mide tu tasa de sudor&lt;/h2&gt;
+      &lt;p class=&quot;sub&quot;&gt;Una hora, una báscula y ya no vuelves a adivinar. Hazlo dos veces: un día fresco y un día caluroso.&lt;/p&gt;
+      &lt;div class=&quot;row&quot;&gt;
+        &lt;div class=&quot;field&quot;&gt;&lt;label for=&quot;pre&quot;&gt;Peso antes (kg)&lt;/label&gt;&lt;input type=&quot;number&quot; id=&quot;pre&quot; step=&quot;0.1&quot; placeholder=&quot;72.4&quot;&gt;&lt;/div&gt;
+        &lt;div class=&quot;field&quot;&gt;&lt;label for=&quot;post&quot;&gt;Peso después (kg)&lt;/label&gt;&lt;input type=&quot;number&quot; id=&quot;post&quot; step=&quot;0.1&quot; placeholder=&quot;71.2&quot;&gt;&lt;/div&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;row&quot;&gt;
+        &lt;div class=&quot;field&quot;&gt;&lt;label for=&quot;bebido&quot;&gt;Líquido bebido (ml)&lt;/label&gt;&lt;input type=&quot;number&quot; id=&quot;bebido&quot; step=&quot;50&quot; placeholder=&quot;600&quot;&gt;&lt;/div&gt;
+        &lt;div class=&quot;field&quot;&gt;&lt;label for=&quot;durTest&quot;&gt;Duración (min)&lt;/label&gt;&lt;input type=&quot;number&quot; id=&quot;durTest&quot; step=&quot;5&quot; placeholder=&quot;60&quot;&gt;&lt;/div&gt;
+      &lt;/div&gt;
+      &lt;button class=&quot;btn btn-main no-print&quot; id=&quot;calcTest&quot; type=&quot;button&quot; style=&quot;margin-top:6px&quot;&gt;Calcular y usar&lt;/button&gt;
+      &lt;p class=&quot;hint&quot; id=&quot;testOut&quot;&gt;Fórmula: (peso perdido en gramos + líquido bebido) ÷ horas. Orina antes de pesarte y pésate con la misma ropa, seco.&lt;/p&gt;
+    &lt;/section&gt;
+
+    &lt;section class=&quot;panel&quot;&gt;
+      &lt;h2&gt;Después de entrenar&lt;/h2&gt;
+      &lt;p class=&quot;sub&quot; id=&quot;recoTxt&quot;&gt;—&lt;/p&gt;
+      &lt;details&gt;
+        &lt;summary&gt;Composición de los productos (edítala si cambia la fórmula)&lt;/summary&gt;
+        &lt;div class=&quot;row&quot;&gt;
+          &lt;div class=&quot;field&quot;&gt;&lt;label for=&quot;rawNa&quot;&gt;RAW · sodio por scoop (mg)&lt;/label&gt;&lt;input type=&quot;number&quot; id=&quot;rawNa&quot; value=&quot;300&quot; step=&quot;10&quot;&gt;&lt;/div&gt;
+          &lt;div class=&quot;field&quot;&gt;&lt;label for=&quot;rawK&quot;&gt;RAW · potasio (mg)&lt;/label&gt;&lt;input type=&quot;number&quot; id=&quot;rawK&quot; value=&quot;150&quot; step=&quot;10&quot;&gt;&lt;/div&gt;
+          &lt;div class=&quot;field&quot;&gt;&lt;label for=&quot;rawMg&quot;&gt;RAW · magnesio (mg)&lt;/label&gt;&lt;input type=&quot;number&quot; id=&quot;rawMg&quot; value=&quot;36&quot; step=&quot;5&quot;&gt;&lt;/div&gt;
+        &lt;/div&gt;
+        &lt;div class=&quot;row&quot;&gt;
+          &lt;div class=&quot;field&quot;&gt;&lt;label for=&quot;cpCho&quot;&gt;C-PRIX · carbohidrato por scoop (g)&lt;/label&gt;&lt;input type=&quot;number&quot; id=&quot;cpCho&quot; value=&quot;25&quot; step=&quot;1&quot;&gt;&lt;/div&gt;
+          &lt;div class=&quot;field&quot;&gt;&lt;label for=&quot;cpNa&quot;&gt;C-PRIX · sodio por scoop (mg)&lt;/label&gt;&lt;input type=&quot;number&quot; id=&quot;cpNa&quot; value=&quot;200&quot; step=&quot;10&quot;&gt;&lt;/div&gt;
+        &lt;/div&gt;
+        &lt;p class=&quot;hint&quot;&gt;Todo el plan se recalcula con estos valores, así que la web no hay que reescribirla cuando cambie la etiqueta.&lt;/p&gt;
+      &lt;/details&gt;
+    &lt;/section&gt;
+
+  &lt;/div&gt;
+
+  &lt;!-- ============ COLUMNA DERECHA: PLAN ============ --&gt;
+  &lt;div class=&quot;sticky-col&quot;&gt;
+
+    &lt;section class=&quot;sticker&quot; id=&quot;sticker&quot;&gt;
+      &lt;div class=&quot;sticker-head&quot;&gt;
+        &lt;h2 id=&quot;planTitle&quot;&gt;Tu plan&lt;/h2&gt;
+        &lt;p id=&quot;planSub&quot;&gt;—&lt;/p&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;dials&quot;&gt;
+        &lt;div class=&quot;dial&quot;&gt;&lt;b id=&quot;dLiq&quot;&gt;0&lt;/b&gt;&lt;i&gt;ml de líquido por hora&lt;/i&gt;&lt;/div&gt;
+        &lt;div class=&quot;dial hot&quot;&gt;&lt;b id=&quot;dNa&quot;&gt;0&lt;/b&gt;&lt;i&gt;mg de sodio por hora&lt;/i&gt;&lt;/div&gt;
+        &lt;div class=&quot;dial hot&quot;&gt;&lt;b id=&quot;dCho&quot;&gt;0&lt;/b&gt;&lt;i&gt;g de carbohidrato por hora&lt;/i&gt;&lt;/div&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;segs&quot; id=&quot;segs&quot;&gt;&lt;/div&gt;
+      &lt;div class=&quot;bar no-print&quot;&gt;
+        &lt;button class=&quot;btn btn-main&quot; id=&quot;printBtn&quot; type=&quot;button&quot;&gt;Imprimir la pegatina&lt;/button&gt;
+        &lt;button class=&quot;btn btn-ghost&quot; id=&quot;saveBtn&quot; type=&quot;button&quot;&gt;Guardar mi perfil&lt;/button&gt;
+      &lt;/div&gt;
+    &lt;/section&gt;
+
+    &lt;div class=&quot;warns&quot; id=&quot;warns&quot;&gt;&lt;/div&gt;
+
+    &lt;section class=&quot;panel&quot; style=&quot;margin-top:18px&quot;&gt;
+      &lt;h2&gt;Qué echas en cada bidón&lt;/h2&gt;
+      &lt;p class=&quot;sub&quot; id=&quot;bidonSub&quot;&gt;—&lt;/p&gt;
+      &lt;div class=&quot;tablewrap&quot;&gt;
+        &lt;table id=&quot;bidonTable&quot;&gt;
+          &lt;thead&gt;&lt;tr&gt;&lt;th&gt;Recipiente&lt;/th&gt;&lt;th&gt;Contenido&lt;/th&gt;&lt;th&gt;Cubre&lt;/th&gt;&lt;th&gt;Concentración&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;
+          &lt;tbody&gt;&lt;/tbody&gt;
+        &lt;/table&gt;
+      &lt;/div&gt;
+      &lt;p class=&quot;hint&quot; id=&quot;concNote&quot;&gt;&lt;/p&gt;
+    &lt;/section&gt;
+
+    &lt;section class=&quot;panel&quot;&gt;
+      &lt;h2&gt;Reloj de ingesta&lt;/h2&gt;
+      &lt;p class=&quot;sub&quot;&gt;Beber a sorbos cada 15–20 minutos vacía el estómago mejor que tres tragos grandes por hora.&lt;/p&gt;
+      &lt;div class=&quot;tablewrap&quot;&gt;
+        &lt;table id=&quot;timeTable&quot;&gt;
+          &lt;thead&gt;&lt;tr&gt;&lt;th&gt;Momento&lt;/th&gt;&lt;th&gt;Segmento&lt;/th&gt;&lt;th&gt;Líquido&lt;/th&gt;&lt;th&gt;Carbohidrato&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;
+          &lt;tbody&gt;&lt;/tbody&gt;
+        &lt;/table&gt;
+      &lt;/div&gt;
+    &lt;/section&gt;
+
+    &lt;section class=&quot;panel&quot;&gt;
+      &lt;h2&gt;Total de producto&lt;/h2&gt;
+      &lt;div class=&quot;tablewrap&quot;&gt;
+        &lt;table id=&quot;totalTable&quot;&gt;
+          &lt;thead&gt;&lt;tr&gt;&lt;th&gt;Concepto&lt;/th&gt;&lt;th&gt;Cantidad&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;
+          &lt;tbody&gt;&lt;/tbody&gt;
+        &lt;/table&gt;
+      &lt;/div&gt;
+      &lt;span class=&quot;saved&quot; id=&quot;savedMsg&quot;&gt;&lt;/span&gt;
+    &lt;/section&gt;
+
+    &lt;section class=&quot;panel&quot;&gt;
+      &lt;h2&gt;Si quieres subir a 90–120 g/h&lt;/h2&gt;
+      &lt;p class=&quot;sub&quot;&gt;El intestino se entrena como los gemelos. Cuatro semanas, siempre en sesiones largas y a ritmo suave, nunca estrenando nada en competición.&lt;/p&gt;
+      &lt;div class=&quot;tablewrap&quot;&gt;
+        &lt;table&gt;
+          &lt;thead&gt;&lt;tr&gt;&lt;th&gt;Semana&lt;/th&gt;&lt;th&gt;Objetivo por hora&lt;/th&gt;&lt;th&gt;Dónde practicarlo&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;
+          &lt;tbody&gt;
+            &lt;tr&gt;&lt;td&gt;1&lt;/td&gt;&lt;td&gt;&lt;b&gt;60 g&lt;/b&gt;&lt;/td&gt;&lt;td&gt;Fondo de bici de 3 h&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td&gt;2&lt;/td&gt;&lt;td&gt;&lt;b&gt;75 g&lt;/b&gt;&lt;/td&gt;&lt;td&gt;Fondo de bici + 20 min de carrera&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td&gt;3&lt;/td&gt;&lt;td&gt;&lt;b&gt;90 g&lt;/b&gt;&lt;/td&gt;&lt;td&gt;Simulacro de bici a ritmo de carrera&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td&gt;4&lt;/td&gt;&lt;td&gt;&lt;b&gt;100–110 g&lt;/b&gt;&lt;/td&gt;&lt;td&gt;Brick largo con el bidón exacto del día D&lt;/td&gt;&lt;/tr&gt;
+          &lt;/tbody&gt;
+        &lt;/table&gt;
+      &lt;/div&gt;
+    &lt;/section&gt;
+
+  &lt;/div&gt;
+&lt;/main&gt;
+
+&lt;footer&gt;
+  &lt;div class=&quot;wrap&quot;&gt;
+    &lt;p class=&quot;prose&quot;&gt;&lt;strong&gt;Cómo se calcula.&lt;/strong&gt; La tasa de sudor parte de tu peso, la modalidad, la temperatura y la humedad, y se sustituye entre el 70 y el 80 % —reponer el 100 % no es posible ni deseable. El sodio sale de tu pérdida estimada por litro de sudor según la categoría que elijas. Los carbohidratos suben con la duración y se limitan por tu tolerancia digestiva: la mezcla 1:0,8 de glucosa y fructosa usa dos transportadores intestinales distintos, y por eso permite pasar del techo de 60 g/h de la glucosa sola.&lt;/p&gt;
+    &lt;p class=&quot;prose&quot; style=&quot;margin-top:14px&quot;&gt;Son estimaciones para orientar el entrenamiento, no una pauta médica. Si tomas medicación, tienes hipertensión o una condición renal o cardiaca, consúltalo antes de subir el sodio.&lt;/p&gt;
+  &lt;/div&gt;
+&lt;/footer&gt;
+
+&lt;script&gt;
+(function(){
+  &quot;use strict&quot;;
+
+  /* ---------- modelo ---------- */
+  var MOD = {
+    natacion:{label:&quot;Natación&quot;, sweat:350,  cho:0,    drinkCap:0,    note:&quot;Sin ingesta. Llegas con la precarga hecha.&quot;},
+    bici:    {label:&quot;Bici&quot;,     sweat:650,  cho:1.0,  drinkCap:1000, note:&quot;Aquí se come. Es el único segmento donde el estómago acepta volumen.&quot;},
+    rodillo: {label:&quot;Rodillo&quot;,  sweat:1150, cho:1.0,  drinkCap:1200, note:&quot;Sin viento no hay evaporación: sudas casi el doble y bebes más fácil.&quot;},
+    carrera: {label:&quot;Carrera a pie&quot;, sweat:820, cho:0.85, drinkCap:750, note:&quot;El impacto reduce la absorción. Concentrado en flask o geles con agua.&quot;}
+  };
+
+  var PRESETS = {
+    z2:      {label:&quot;Z2 en ayunas&quot;,  small:&quot;1–1,5 h&quot;,  hours:1.25, inten:&quot;z2&quot;,     segs:[[&quot;bici&quot;,1]]},
+    rodillo: {label:&quot;Rodillo&quot;,       small:&quot;indoor&quot;,   hours:1.5,  inten:&quot;tempo&quot;,  segs:[[&quot;rodillo&quot;,1]]},
+    fondo:   {label:&quot;Fondo en bici&quot;, small:&quot;ruta&quot;,     hours:4,    inten:&quot;z2&quot;,     segs:[[&quot;bici&quot;,1]]},
+    tirada:  {label:&quot;Tirada larga&quot;,  small:&quot;a pie&quot;,    hours:2,    inten:&quot;tempo&quot;,  segs:[[&quot;carrera&quot;,1]], run:true, dist:20,   pace:330},
+    k5:      {label:&quot;5K&quot;,            small:&quot;corta&quot;,    hours:.4,   inten:&quot;carrera&quot;,segs:[[&quot;carrera&quot;,1]], run:true, dist:5,    pace:255},
+    k10:     {label:&quot;10K&quot;,           small:&quot;corta&quot;,    hours:.8,   inten:&quot;carrera&quot;,segs:[[&quot;carrera&quot;,1]], run:true, dist:10,   pace:270},
+    k21:     {label:&quot;Media maratón&quot;, small:&quot;larga&quot;,    hours:1.8,  inten:&quot;carrera&quot;,segs:[[&quot;carrera&quot;,1]], run:true, dist:21.1, pace:300},
+    k42:     {label:&quot;Maratón&quot;,       small:&quot;larga&quot;,    hours:3.8,  inten:&quot;tempo&quot;,  segs:[[&quot;carrera&quot;,1]], run:true, dist:42.2, pace:330},
+    ultra:   {label:&quot;Ultra / trail&quot;, small:&quot;larga&quot;,    hours:7,    inten:&quot;z2&quot;,     segs:[[&quot;carrera&quot;,1]], run:true, dist:50,   pace:480},
+    brick:   {label:&quot;Brick&quot;,         small:&quot;bici+pie&quot;, hours:2.5,  inten:&quot;tempo&quot;,  segs:[[&quot;bici&quot;,.72],[&quot;carrera&quot;,.28]]},
+    sprint:  {label:&quot;Sprint&quot;,        small:&quot;750/20/5&quot;, hours:1.2,  inten:&quot;carrera&quot;,segs:[[&quot;natacion&quot;,.1],[&quot;bici&quot;,.55],[&quot;carrera&quot;,.35]]},
+    olimpico:{label:&quot;Olímpico&quot;,      small:&quot;1,5/40/10&quot;,hours:2.5,  inten:&quot;carrera&quot;,segs:[[&quot;natacion&quot;,.1],[&quot;bici&quot;,.5],[&quot;carrera&quot;,.4]]},
+    half:    {label:&quot;70.3&quot;,          small:&quot;1,9/90/21&quot;,hours:5.5,  inten:&quot;carrera&quot;,segs:[[&quot;natacion&quot;,.08],[&quot;bici&quot;,.55],[&quot;carrera&quot;,.37]]},
+    full:    {label:&quot;Ironman&quot;,       small:&quot;3,8/180/42&quot;,hours:12,  inten:&quot;z2&quot;,     segs:[[&quot;natacion&quot;,.08],[&quot;bici&quot;,.52],[&quot;carrera&quot;,.4]]}
+  };
+
+  var SAL = {bajo:450, medio:800, alto:1200, muy:1600};
+  var INTEN = {z2:.85, tempo:1, carrera:1.15};
+
+  var state = {preset:&quot;fondo&quot;, sal:&quot;medio&quot;, gut:90, bottles:[1200,750], bottlePreset:&quot;1200,750&quot;};
+
+  var $ = function(id){return document.getElementById(id);};
+
+  function heatFactor(t){
+    var pts=[[5,.72],[10,.78],[15,.88],[20,1],[25,1.18],[30,1.4],[35,1.62],[42,1.82]];
+    if(t&lt;=pts[0][0]) return pts[0][1];
+    for(var i=1;i&lt;pts.length;i++){
+      if(t&lt;=pts[i][0]){
+        var a=pts[i-1], b=pts[i];
+        return a[1]+(b[1]-a[1])*(t-a[0])/(b[0]-a[0]);
+      }
+    }
+    return 1.82;
+  }
+
+  function choBase(h, inten){
+    var g;
+    if(h&lt;1) g=20; else if(h&lt;2) g=50; else if(h&lt;3) g=70; else if(h&lt;5) g=85; else g=95;
+    if(inten===&quot;z2&quot;) g-=8;
+    if(inten===&quot;carrera&quot;) g+=8;
+    return g;
+  }
+
+  function r5(n){return Math.round(n/5)*5;}
+  function r10(n){return Math.round(n/10)*10;}
+  function half(n){return Math.round(n*2)/2;}
+  function hm(h){
+    var t=Math.round(h*60), m=t%60;
+    return Math.floor(t/60)+&quot;:&quot;+(m&lt;10?&quot;0&quot;:&quot;&quot;)+m;
+  }
+
+  /* ---------- cálculo ---------- */
+  function compute(){
+    var P    = PRESETS[state.preset];
+    var kg   = parseFloat($(&quot;peso&quot;).value)||72;
+    var med  = parseFloat($(&quot;sudorMedido&quot;).value)||0;
+    var temp = parseFloat($(&quot;temp&quot;).value)||20;
+    var hum  = parseFloat($(&quot;hum&quot;).value)||1;
+    var inten= $(&quot;inten&quot;).value;
+    var bottles  = (state.bottles &amp;&amp; state.bottles.length) ? state.bottles.slice() : [750];
+    var totalCap = bottles.reduce(function(a,b){return a+b;},0) || 750;
+    var ayunas = $(&quot;ayunas&quot;).checked;
+
+    var dist = parseFloat($(&quot;dist&quot;).value)||10;
+    var pace = parseFloat($(&quot;ritmo&quot;).value)||300;   // segundos por km
+    var speed = 3600/pace;                          // km/h
+    var runFactor = P.run ? Math.max(.72, Math.min(1.4, Math.pow(speed/11, .9))) : 1;
+
+    var h = P.run ? (dist*pace/3600) : (parseFloat($(&quot;horas&quot;).value)||1);
+
+    var rawNa=+$(&quot;rawNa&quot;).value||500, rawK=+$(&quot;rawK&quot;).value||150, rawMg=+$(&quot;rawMg&quot;).value||60;
+    var cpCho=+$(&quot;cpCho&quot;).value||30,  cpNa=+$(&quot;cpNa&quot;).value||180;
+
+    var hf = heatFactor(temp)*hum;
+    var wf = Math.pow(kg/70, .65);
+    var inf= INTEN[inten];
+    var naConc = SAL[state.sal];
+
+    var repNa = h&lt;2 ? .6 : (h&lt;4 ? .75 : .85);
+    var segsDef = P.segs;
+
+    var segs = segsDef.map(function(s){
+      var m = MOD[s[0]], dur = h*s[1];
+      var rf = (s[0]===&quot;carrera&quot;) ? runFactor : 1;
+      var sweat = (med&gt;0 ? med*hf*inf*(m.sweat/650) : m.sweat*hf*inf*wf) * rf;
+      if(s[0]===&quot;natacion&quot;) sweat = Math.min(sweat, 500);
+      var drink = Math.max(300, Math.min(m.drinkCap, sweat*.75));
+      if(m.drinkCap===0) drink = 0;
+      var cho = m.cho===0 ? 0 : Math.min(state.gut, r5(choBase(h,inten)*m.cho));
+      if(ayunas &amp;&amp; h&lt;=1.5) cho = 0;
+      var na = m.drinkCap===0 ? 0 : r10(Math.min(1800, Math.max(250, sweat/1000*naConc*repNa)));
+      return {
+        key:s[0], label:m.label, note:m.note, dur:dur,
+        sweat:Math.round(sweat), drink:Math.round(drink/10)*10,
+        cho:cho, na:na,
+        liqTot:Math.round(drink*dur), choTot:Math.round(cho*dur), naTot:Math.round(na*dur)
+      };
+    });
+
+    var tot = segs.reduce(function(a,s){
+      a.liq+=s.liqTot; a.cho+=s.choTot; a.na+=s.naTot; a.sweat+=s.sweat*s.dur; return a;
+    },{liq:0,cho:0,na:0,sweat:0});
+
+    var cprix = half(tot.cho/cpCho);
+    var naFromCprix = cprix*cpNa;
+    var raw = half(Math.max(0,(tot.na-naFromCprix))/rawNa);
+
+    var deficit = Math.max(0, tot.sweat - tot.liq);
+
+    var main = segs.reduce(function(a,b){return b.dur&gt;a.dur?b:a;}, segs[0]);
+    var conc = main.drink&gt;0 ? (main.cho/main.drink*100) : 0;
+
+    return {
+      kg:kg,h:h,temp:temp,inten:inten,bottles:bottles,totalCap:totalCap,ayunas:ayunas,med:med,
+      isRun:!!P.run, dist:dist, pace:pace, speed:speed,
+      segs:segs, tot:tot, main:main, conc:conc, deficit:deficit,
+      cprix:cprix, raw:raw, cpCho:cpCho, cpNa:cpNa, rawNa:rawNa, rawK:rawK, rawMg:rawMg
+    };
+  }
+
+  /* ---------- pintado ---------- */
+  function render(){
+    var d = compute();
+    var P = PRESETS[state.preset];
+
+    var run = $(&quot;runBlock&quot;);
+    run.hidden = !d.isRun;
+    $(&quot;horas&quot;).disabled = d.isRun;
+    $(&quot;horasNota&quot;).hidden = !d.isRun;
+    if(d.isRun){
+      $(&quot;horas&quot;).value = Math.min(17, Math.max(.5, d.h));
+      var mm = Math.floor(d.pace/60), ss = d.pace%60;
+      $(&quot;ritmoVal&quot;).textContent = mm+&quot;:&quot;+(ss&lt;10?&quot;0&quot;:&quot;&quot;)+ss+&quot; /km&quot;;
+      $(&quot;ritmoNota&quot;).textContent = d.speed.toFixed(1)+&quot; km/h · &quot;+d.dist+&quot; km en &quot;+hm(d.h)+
+        &quot;. Cuanto más rápido corres, más calor generas y más sudas: el ritmo entra en el cálculo.&quot;;
+    }
+
+    $(&quot;horasVal&quot;).textContent = hm(d.h);
+    $(&quot;tempVal&quot;).textContent = d.temp+&quot; °C&quot;;
+
+    $(&quot;planTitle&quot;).textContent = P.label+&quot; · &quot;+hm(d.h)+&quot; h a &quot;+d.temp+&quot; °C&quot;;
+    $(&quot;planSub&quot;).textContent = d.med&gt;0
+      ? &quot;Con tu tasa de sudor medida (&quot;+d.med+&quot; ml/h de referencia).&quot;
+      : &quot;Con una tasa de sudor estimada. Mídela y el plan gana precisión.&quot;;
+
+    $(&quot;dLiq&quot;).textContent = d.main.drink;
+    $(&quot;dNa&quot;).textContent  = d.main.na;
+    $(&quot;dCho&quot;).textContent = d.main.cho;
+
+    /* segmentos */
+    var sh = &quot;&quot;;
+    d.segs.forEach(function(s){
+      sh += &#x27;&lt;div class=&quot;seg&quot;&gt;&lt;div class=&quot;seg-top&quot;&gt;&lt;b&gt;&#x27;+s.label+&#x27;&lt;/b&gt;&lt;span&gt;&#x27;+hm(s.dur)+&#x27; h&lt;/span&gt;&lt;/div&gt;&#x27;;
+      if(s.key===&quot;natacion&quot;){
+        sh += &#x27;&lt;div class=&quot;seg-body&quot;&gt;&#x27;+s.note+&#x27;&lt;/div&gt;&#x27;;
+      }else{
+        sh += &#x27;&lt;div class=&quot;seg-body&quot;&gt;&#x27;+s.drink+&#x27; ml, &#x27;+s.cho+&#x27; g de carbohidrato y &#x27;+s.na+&#x27; mg de sodio por hora. &#x27;+s.note+&#x27;&lt;/div&gt;&#x27;;
+        sh += &#x27;&lt;div class=&quot;seg-scoops&quot;&gt;&lt;span class=&quot;pill water&quot;&gt;&#x27;+(s.liqTot&gt;=1000?(s.liqTot/1000).toFixed(1)+&#x27; L&#x27;:s.liqTot+&#x27; ml&#x27;)+&#x27;&lt;/span&gt;&#x27;+
+              &#x27;&lt;span class=&quot;pill&quot;&gt;&#x27;+s.choTot+&#x27; g carbo&lt;/span&gt;&#x27;+
+              &#x27;&lt;span class=&quot;pill&quot;&gt;&#x27;+(s.naTot&gt;=1000?(s.naTot/1000).toFixed(1)+&#x27; g&#x27;:s.naTot+&#x27; mg&#x27;)+&#x27; sodio&lt;/span&gt;&lt;/div&gt;&#x27;;
+      }
+      sh += &#x27;&lt;/div&gt;&#x27;;
+    });
+    $(&quot;segs&quot;).innerHTML = sh;
+
+    /* avisos */
+    var w = [];
+    if(d.main.drink &gt;= 950) w.push([&quot;Vas al límite de lo que el estómago vacía&quot;,&quot;Por encima de un litro por hora el líquido se queda dentro. Baja el ritmo, busca sombra o acepta un déficit controlado.&quot;]);
+    if(d.deficit &gt; d.kg*1000*0.03) w.push([&quot;Déficit por encima del 3 % de tu peso&quot;,&quot;Con esa pérdida caen el rendimiento y la termorregulación. Planifica más avituallamientos o reduce la intensidad.&quot;]);
+    if(d.main.cho &gt;= state.gut &amp;&amp; d.h&gt;2) w.push([&quot;Estás en tu techo digestivo&quot;,&quot;Para subir de ahí hay que entrenar el intestino durante semanas. Hoy quédate en &quot;+state.gut+&quot; g/h.&quot;]);
+    if(d.conc &gt; 10) w.push([&quot;Bebida demasiado concentrada (&quot;+d.conc.toFixed(1)+&quot; %)&quot;,&quot;Por encima del 10 % el vaciado gástrico se frena. Reparte el carbohidrato en un flask concentrado y lleva agua aparte.&quot;]);
+    if(d.main.na &gt; 1400) w.push([&quot;Sodio muy alto&quot;,&quot;Verifica tu categoría de sudor salado con un test real antes de sostener esto durante horas.&quot;]);
+    if(d.h&gt;3 &amp;&amp; d.main.cho&lt;60) w.push([&quot;Te vas a quedar corto de energía&quot;,&quot;Más de tres horas con menos de 60 g/h termina en pájara. Sube el objetivo si tu intestino lo tolera.&quot;]);
+    if(d.ayunas &amp;&amp; d.h&gt;1.5) w.push([&quot;Ayunas y sesión larga no combinan&quot;,&quot;Por encima de hora y media en ayunas el coste hormonal y la calidad del entrenamiento no compensan.&quot;]);
+    if(d.isRun &amp;&amp; d.h&lt;1) w.push([&quot;Menos de una hora corriendo&quot;,
+      &quot;A esta distancia el depósito de glucógeno basta. Sodio si hace calor, y con enjuagar la boca con bebida carbohidratada ya hay efecto: el estómago no necesita más.&quot;]);
+    if(d.isRun &amp;&amp; d.h&gt;2.5 &amp;&amp; d.speed&gt;12) w.push([&quot;Ritmo alto y muchas horas&quot;,
+      &quot;Por encima de 12 km/h sostenidos la absorción cae. Divide la toma en sorbos más frecuentes y no estrenes concentración el día de la carrera.&quot;]);
+    if(d.temp&gt;=30) w.push([&quot;Calor exigente&quot;,&quot;Precarga: 500 ml con 1 scoop de RAW entre 2 y 3 horas antes de salir, y enfría la bebida.&quot;]);
+    if(!w.length) w.push([&quot;Plan coherente&quot;,&quot;Nada fuera de rango. Pruébalo en entrenamiento antes de usarlo en competición.&quot;,&quot;good&quot;]);
+
+    $(&quot;warns&quot;).innerHTML = w.map(function(x){
+      return &#x27;&lt;div class=&quot;warn&#x27;+(x[2]===&quot;good&quot;?&quot; good&quot;:&quot;&quot;)+&#x27;&quot;&gt;&lt;div&gt;&lt;b&gt;&#x27;+x[0]+&#x27;&lt;/b&gt;&#x27;+x[1]+&#x27;&lt;/div&gt;&lt;/div&gt;&#x27;;
+    }).join(&quot;&quot;);
+
+    /* bidones */
+    var tb = $(&quot;bidonTable&quot;).querySelector(&quot;tbody&quot;);
+    var rows = &quot;&quot;;
+    var usarConcentrado = d.conc &gt; 10 || d.main.cho &gt; 75;
+    var ride = d.segs.filter(function(s){return s.key!==&quot;natacion&quot;;});
+
+    var capTxt = d.bottles.map(function(c){return c+&quot; ml&quot;;}).join(&quot; + &quot;);
+    $(&quot;bottleCapNota&quot;).textContent = &quot;Llevas &quot;+capTxt+&quot; contigo (&quot;+
+      (d.totalCap&gt;=1000?(d.totalCap/1000).toFixed(2)+&quot; L&quot;:d.totalCap+&quot; ml&quot;)+&quot; en total por salida).&quot;;
+
+    ride.forEach(function(s){
+      var rounds = Math.max(1, Math.ceil(s.liqTot/d.totalCap));
+      var refills = rounds-1;
+      var refillTxt = refills&gt;0 ? (&quot; · rellena &quot;+refills+&quot; vez&quot;+(refills&gt;1?&quot;es&quot;:&quot;&quot;)) : &quot;&quot;;
+
+      if(usarConcentrado){
+        var cpT = half(s.choTot/d.cpCho);
+        var rwT = half(Math.max(0,(s.naTot - cpT*d.cpNa))/d.rawNa);
+        var minCap = Math.min.apply(null, d.bottles);
+        var others = d.bottles.filter(function(c,i){return i!==d.bottles.indexOf(minCap);});
+
+        rows += &quot;&lt;tr&gt;&lt;td&gt;&lt;b&gt;&quot;+s.label+&quot;&lt;/b&gt;&lt;br&gt;&lt;span class=&#x27;hint&#x27;&gt;flask concentrado (&quot;+minCap+&quot; ml)&lt;/span&gt;&lt;/td&gt;&quot;+
+                &quot;&lt;td&gt;&quot;+cpT+&quot; scoops de C-PRIX + &quot;+rwT+&quot; de RAW, con poca agua&lt;/td&gt;&quot;+
+                &quot;&lt;td&gt;todo el segmento, un trago cada 15 min&lt;/td&gt;&lt;td&gt;concentrado&lt;/td&gt;&lt;/tr&gt;&quot;;
+
+        if(others.length){
+          rows += &quot;&lt;tr&gt;&lt;td&gt;Resto (&quot;+others.join(&quot; + &quot;)+&quot; ml)&lt;/td&gt;&lt;td&gt;agua sola&lt;/td&gt;&quot;+
+                  &quot;&lt;td&gt;&quot;+(s.liqTot/1000).toFixed(1)+&quot; L en total&quot;+refillTxt+&quot;&lt;/td&gt;&lt;td&gt;—&lt;/td&gt;&lt;/tr&gt;&quot;;
+        }else{
+          rows += &quot;&lt;tr&gt;&lt;td colspan=&#x27;2&#x27;&gt;Solo llevas el flask: el resto del agua (&quot;+(s.liqTot/1000).toFixed(1)+&quot; L) sale de los puestos de avituallamiento.&lt;/td&gt;&lt;td&gt;—&lt;/td&gt;&lt;td&gt;—&lt;/td&gt;&lt;/tr&gt;&quot;;
+        }
+      }else{
+        d.bottles.forEach(function(cap){
+          var share = cap/d.totalCap;
+          var choR = (s.choTot/rounds)*share, naR = (s.naTot/rounds)*share;
+          var cp = half(choR/d.cpCho), rw = half(Math.max(0, naR - cp*d.cpNa)/d.rawNa);
+          var minutos = s.drink&gt;0 ? Math.round(cap/s.drink*60) : 0;
+          var cc = cap&gt;0 ? (choR/cap*100).toFixed(1)+&quot; %&quot; : &quot;—&quot;;
+          rows += &quot;&lt;tr&gt;&lt;td&gt;&lt;b&gt;&quot;+s.label+&quot;&lt;/b&gt;&lt;br&gt;&lt;span class=&#x27;hint&#x27;&gt;&quot;+cap+&quot; ml&lt;/span&gt;&lt;/td&gt;&quot;+
+                  &quot;&lt;td&gt;&quot;+cp+&quot; scoops de C-PRIX + &quot;+rw+&quot; de RAW&lt;/td&gt;&quot;+
+                  &quot;&lt;td&gt;&quot;+minutos+&quot; min&quot;+refillTxt+&quot;&lt;/td&gt;&lt;td&gt;&quot;+cc+&quot;&lt;/td&gt;&lt;/tr&gt;&quot;;
+        });
+      }
+    });
+    tb.innerHTML = rows;
+    $(&quot;bidonSub&quot;).textContent = usarConcentrado
+      ? &quot;Con esta carga de carbohidrato la mezcla queda espesa: usa la botella más chica como flask concentrado y deja el resto solo con agua. Es lo que hacen en las distancias largas.&quot;
+      : &quot;Reparte la mezcla entre tus botellas según su tamaño. Márcalas con cinta para no confundirlas en la transición.&quot;;
+    $(&quot;concNote&quot;).textContent = &quot;Concentración de referencia: bebida isotónica 6–8 %. Por encima del 10 % conviene separar carbohidrato y agua.&quot;;
+
+    /* reloj */
+    var tt = $(&quot;timeTable&quot;).querySelector(&quot;tbody&quot;);
+    var tr = &quot;&quot;, acc = 0;
+    d.segs.forEach(function(s){
+      var blocks = Math.max(1, Math.round(s.dur*3));
+      var paso = s.dur/blocks;
+      for(var i=0;i&lt;blocks;i++){
+        if(s.key===&quot;natacion&quot;){ acc += paso; continue; }
+        var marca = d.isRun ? (&quot;km &quot;+(acc*d.speed).toFixed(1)) : s.label;
+        tr += &quot;&lt;tr&gt;&lt;td&gt;&lt;b&gt;&quot;+hm(acc)+&quot;&lt;/b&gt;&lt;/td&gt;&lt;td&gt;&quot;+marca+&quot;&lt;/td&gt;&lt;td&gt;&quot;+Math.round(s.drink*paso/10)*10+&quot; ml&lt;/td&gt;&lt;td&gt;&quot;+Math.round(s.cho*paso)+&quot; g&lt;/td&gt;&lt;/tr&gt;&quot;;
+        acc += paso;
+      }
+    });
+    if(!tr) tr = &quot;&lt;tr&gt;&lt;td colspan=&#x27;4&#x27;&gt;Sesión sin ingesta programada.&lt;/td&gt;&lt;/tr&gt;&quot;;
+    tt.innerHTML = tr;
+
+    /* totales */
+    var lt = $(&quot;totalTable&quot;).querySelector(&quot;tbody&quot;);
+    lt.innerHTML =
+      &quot;&lt;tr&gt;&lt;td&gt;Kinetix C-PRIX&lt;/td&gt;&lt;td&gt;&lt;b&gt;&quot;+d.cprix+&quot;&lt;/b&gt; scoops · &quot;+d.tot.cho+&quot; g de carbohidrato&lt;/td&gt;&lt;/tr&gt;&quot;+
+      &quot;&lt;tr&gt;&lt;td&gt;Kinetix RAW&lt;/td&gt;&lt;td&gt;&lt;b&gt;&quot;+d.raw+&quot;&lt;/b&gt; scoops · &quot;+Math.round(d.raw*d.rawK)+&quot; mg de potasio, &quot;+Math.round(d.raw*d.rawMg)+&quot; mg de magnesio&lt;/td&gt;&lt;/tr&gt;&quot;+
+      &quot;&lt;tr&gt;&lt;td&gt;Sodio total&lt;/td&gt;&lt;td&gt;&lt;b&gt;&quot;+Math.round(d.cprix*d.cpNa + d.raw*d.rawNa)+&quot;&lt;/b&gt; mg&lt;/td&gt;&lt;/tr&gt;&quot;+
+      &quot;&lt;tr&gt;&lt;td&gt;Líquido total&lt;/td&gt;&lt;td&gt;&lt;b&gt;&quot;+(d.tot.liq/1000).toFixed(1)+&quot;&lt;/b&gt; L&lt;/td&gt;&lt;/tr&gt;&quot;+
+      &quot;&lt;tr&gt;&lt;td&gt;Sudor estimado&lt;/td&gt;&lt;td&gt;&lt;b&gt;&quot;+(d.tot.sweat/1000).toFixed(1)+&quot;&lt;/b&gt; L · déficit de &quot;+(d.deficit/1000).toFixed(1)+&quot; L&lt;/td&gt;&lt;/tr&gt;&quot;;
+
+    /* recuperación */
+    var reh = Math.round(d.deficit*1.35/50)*50;
+    $(&quot;recoTxt&quot;).textContent =
+      &quot;Rehidrata con unos &quot;+reh+&quot; ml en las dos horas siguientes —un 35 % más que el déficit, porque parte se pierde por orina— con 1 scoop de RAW por cada 750 ml. &quot;+
+      &quot;Para recuperar: &quot;+Math.round(d.kg*1.0)+&quot; g de carbohidrato y &quot;+Math.round(d.kg*.3)+&quot; g de proteína en la primera hora.&quot;;
+  }
+
+  /* ---------- equipo de botellas ---------- */
+  function renderCustomBottles(){
+    var wrap = $(&quot;customBottleRows&quot;);
+    wrap.innerHTML = state.bottles.map(function(cap,i){
+      return &#x27;&lt;div class=&quot;row&quot; style=&quot;align-items:center;margin-bottom:8px&quot;&gt;&#x27;+
+        &#x27;&lt;div class=&quot;field&quot; style=&quot;flex:1 1 140px;margin-bottom:0&quot;&gt;&#x27;+
+          &#x27;&lt;input type=&quot;number&quot; class=&quot;bottleCapInput&quot; data-i=&quot;&#x27;+i+&#x27;&quot; min=&quot;100&quot; max=&quot;2500&quot; step=&quot;50&quot; value=&quot;&#x27;+cap+&#x27;&quot;&gt;&#x27;+
+        &#x27;&lt;/div&gt;&#x27;+
+        &#x27;&lt;button class=&quot;btn btn-ghost no-print removeBottle&quot; data-i=&quot;&#x27;+i+&#x27;&quot; type=&quot;button&quot; style=&quot;flex:0 0 auto&quot;&gt;Quitar&lt;/button&gt;&#x27;+
+      &#x27;&lt;/div&gt;&#x27;;
+    }).join(&quot;&quot;);
+  }
+
+  $(&quot;bottleChips&quot;).addEventListener(&quot;click&quot;, function(e){
+    var b = e.target.closest(&quot;.chip&quot;); if(!b) return;
+    var v = b.dataset.v;
+    [].forEach.call($(&quot;bottleChips&quot;).children, function(c){c.setAttribute(&quot;aria-pressed&quot;, c===b);});
+    state.bottlePreset = v;
+    if(v === &quot;custom&quot;){
+      if(!state.bottles || !state.bottles.length) state.bottles = [750];
+      $(&quot;customBottles&quot;).hidden = false;
+      renderCustomBottles();
+    }else{
+      $(&quot;customBottles&quot;).hidden = true;
+      state.bottles = v.split(&quot;,&quot;).map(Number);
+    }
+    render();
+  });
+
+  $(&quot;customBottleRows&quot;).addEventListener(&quot;input&quot;, function(e){
+    if(!e.target.classList.contains(&quot;bottleCapInput&quot;)) return;
+    var i = +e.target.dataset.i;
+    state.bottles[i] = +e.target.value || 0;
+    render();
+  });
+  $(&quot;customBottleRows&quot;).addEventListener(&quot;click&quot;, function(e){
+    var b = e.target.closest(&quot;.removeBottle&quot;); if(!b) return;
+    var i = +b.dataset.i;
+    if(state.bottles.length&gt;1){
+      state.bottles.splice(i,1);
+      renderCustomBottles();
+      render();
+    }
+  });
+  $(&quot;addBottleBtn&quot;).addEventListener(&quot;click&quot;, function(){
+    state.bottles.push(500);
+    renderCustomBottles();
+    render();
+  });
+
+  /* ---------- chips ---------- */
+  function buildChips(){
+    var ph = $(&quot;presetChips&quot;), s=&quot;&quot;;
+    Object.keys(PRESETS).forEach(function(k){
+      s += &#x27;&lt;button class=&quot;chip&quot; type=&quot;button&quot; data-v=&quot;&#x27;+k+&#x27;&quot; aria-pressed=&quot;&#x27;+(k===state.preset)+&#x27;&quot;&gt;&#x27;+
+           PRESETS[k].label+&#x27;&lt;small&gt;&#x27;+PRESETS[k].small+&#x27;&lt;/small&gt;&lt;/button&gt;&#x27;;
+    });
+    ph.innerHTML = s;
+    ph.addEventListener(&quot;click&quot;, function(e){
+      var b = e.target.closest(&quot;.chip&quot;); if(!b) return;
+      state.preset = b.dataset.v;
+      [].forEach.call(ph.children, function(c){c.setAttribute(&quot;aria-pressed&quot;, c===b);});
+      var p = PRESETS[state.preset];
+      $(&quot;horas&quot;).value = p.hours;
+      $(&quot;inten&quot;).value = p.inten;
+      if(p.run){ $(&quot;dist&quot;).value = p.dist; $(&quot;ritmo&quot;).value = p.pace; }
+      render();
+    });
+  }
+
+  function bindChipGroup(id, key, asNumber){
+    var g = $(id);
+    g.addEventListener(&quot;click&quot;, function(e){
+      var b = e.target.closest(&quot;.chip&quot;); if(!b) return;
+      state[key] = asNumber ? +b.dataset.v : b.dataset.v;
+      [].forEach.call(g.children, function(c){c.setAttribute(&quot;aria-pressed&quot;, c===b);});
+      render();
+    });
+  }
+
+  /* ---------- prueba de sudor ---------- */
+  $(&quot;calcTest&quot;).addEventListener(&quot;click&quot;, function(){
+    var pre=+$(&quot;pre&quot;).value, post=+$(&quot;post&quot;).value, beb=+$(&quot;bebido&quot;).value||0, min=+$(&quot;durTest&quot;).value||60;
+    if(!pre || !post || post&gt;pre){
+      $(&quot;testOut&quot;).textContent = &quot;Faltan datos o el peso final es mayor que el inicial. Revisa los dos pesajes.&quot;;
+      return;
+    }
+    var ml = ((pre-post)*1000 + beb) / (min/60);
+    $(&quot;sudorMedido&quot;).value = Math.round(ml/10)*10;
+    $(&quot;testOut&quot;).textContent = &quot;Tu tasa de sudor es de &quot;+Math.round(ml)+&quot; ml/h en esas condiciones. Ya está aplicada al plan.&quot;;
+    render();
+  });
+
+  /* ---------- perfil guardado ---------- */
+  var FIELDS = [&quot;peso&quot;,&quot;sudorMedido&quot;,&quot;temp&quot;,&quot;hum&quot;,&quot;horas&quot;,&quot;inten&quot;,&quot;dist&quot;,&quot;ritmo&quot;,&quot;rawNa&quot;,&quot;rawK&quot;,&quot;rawMg&quot;,&quot;cpCho&quot;,&quot;cpNa&quot;];
+  $(&quot;saveBtn&quot;).addEventListener(&quot;click&quot;, function(){
+    try{
+      var o = {
+        sal:state.sal, gut:state.gut, bottles:state.bottles, bottlePreset:state.bottlePreset,
+        preset:state.preset, ayunas:$(&quot;ayunas&quot;).checked
+      };
+      FIELDS.forEach(function(f){o[f]=$(f).value;});
+      localStorage.setItem(&quot;kinetix-perfil&quot;, JSON.stringify(o));
+      $(&quot;savedMsg&quot;).textContent = &quot;Perfil guardado en este navegador.&quot;;
+    }catch(err){
+      $(&quot;savedMsg&quot;).textContent = &quot;Este navegador no permite guardar. Apunta tus datos o imprime el plan.&quot;;
+    }
+  });
+
+  function loadProfile(){
+    try{
+      var raw = localStorage.getItem(&quot;kinetix-perfil&quot;);
+      if(!raw) return;
+      var o = JSON.parse(raw);
+      FIELDS.forEach(function(f){ if(o[f]!==undefined &amp;&amp; o[f]!==&quot;&quot;) $(f).value=o[f]; });
+      if(o.ayunas!==undefined) $(&quot;ayunas&quot;).checked = !!o.ayunas;
+      if(o.sal){ state.sal=o.sal; markGroup(&quot;salChips&quot;, o.sal); }
+      if(o.gut){ state.gut=+o.gut; markGroup(&quot;gutChips&quot;, String(o.gut)); }
+      if(o.preset &amp;&amp; PRESETS[o.preset]){ state.preset=o.preset; markGroup(&quot;presetChips&quot;, o.preset); }
+      if(o.bottles &amp;&amp; o.bottles.length){
+        state.bottles = o.bottles;
+        state.bottlePreset = o.bottlePreset || &quot;custom&quot;;
+        if(state.bottlePreset === &quot;custom&quot;){
+          markGroup(&quot;bottleChips&quot;, &quot;custom&quot;);
+          $(&quot;customBottles&quot;).hidden = false;
+          renderCustomBottles();
+        }else{
+          markGroup(&quot;bottleChips&quot;, state.bottlePreset);
+        }
+      }
+    }catch(err){ /* sin perfil guardado, se arranca con los valores por defecto */ }
+  }
+  function markGroup(id, v){
+    [].forEach.call($(id).children, function(c){c.setAttribute(&quot;aria-pressed&quot;, c.dataset.v===v);});
+  }
+
+  /* ---------- varios ---------- */
+  $(&quot;printBtn&quot;).addEventListener(&quot;click&quot;, function(){ window.print(); });
+  $(&quot;themeBtn&quot;).addEventListener(&quot;click&quot;, function(){
+    var cur = document.documentElement.getAttribute(&quot;data-theme&quot;);
+    var isDark = cur ? cur===&quot;dark&quot; : window.matchMedia(&quot;(prefers-color-scheme: dark)&quot;).matches;
+    document.documentElement.setAttribute(&quot;data-theme&quot;, isDark ? &quot;light&quot; : &quot;dark&quot;);
+  });
+
+  [&quot;peso&quot;,&quot;sudorMedido&quot;,&quot;horas&quot;,&quot;temp&quot;,&quot;hum&quot;,&quot;inten&quot;,&quot;dist&quot;,&quot;ritmo&quot;,&quot;ayunas&quot;,&quot;rawNa&quot;,&quot;rawK&quot;,&quot;rawMg&quot;,&quot;cpCho&quot;,&quot;cpNa&quot;]
+    .forEach(function(id){
+      $(id).addEventListener(&quot;input&quot;, render);
+      $(id).addEventListener(&quot;change&quot;, render);
+    });
+
+  buildChips();
+  bindChipGroup(&quot;salChips&quot;,&quot;sal&quot;,false);
+  bindChipGroup(&quot;gutChips&quot;,&quot;gut&quot;,true);
+  loadProfile();
+  render();
+})();
+&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+"></iframe>
+</div>
+
+<div class="page" id="p-tienda">
+  <section class="pad dark" style="padding-bottom:36px">
+    <h2 class="disp" style="font-size:clamp(48px,9vw,104px)">Tienda</h2>
+    <p class="lead">Elige tu sabor, agrégalo al pedido y envíalo por WhatsApp. Coordinamos el pago y el envío contigo.</p>
+  </section>
+  <section class="pad" style="padding-top:0">
+    <div class="s-grid" id="grid"></div>
+  </section>
+</div>
+
+<button class="c-bar" id="bar" type="button" hidden><span id="barn">Ver pedido</span><span id="bart"></span></button>
+<div class="scrim" id="scrim"></div>
+<aside id="cart" aria-label="Tu pedido" aria-hidden="true">
+  <div class="c-head"><h2 class="disp">Tu pedido</h2><button class="c-x" id="close" type="button" aria-label="Cerrar">×</button></div>
+  <div class="c-items" id="items"></div>
+  <div class="c-pay" id="pay">
+    <div class="c-tot"><span>Total</span><span id="tot">S/ 0.00</span></div>
+    <input id="f-name" placeholder="Nombre" autocomplete="name" aria-label="Nombre">
+    <input id="f-tel" placeholder="Celular" inputmode="tel" autocomplete="tel" aria-label="Celular">
+    <input id="f-addr" placeholder="Dirección y distrito" autocomplete="street-address" aria-label="Dirección y distrito">
+    <a class="c-send" id="send" href="#" target="_blank" rel="noopener" aria-disabled="true">Enviar pedido por WhatsApp</a>
+    <p class="c-note" id="sendHint">Completa nombre, celular y dirección para enviar el pedido. Precios con IGV incluido.</p>
+  </div>
+</aside>
+
+<footer class="pad">
+  <b>KINETIX NUTRITION</b>
+  <span>Kinetix Nutrition SAC · RUC 20615894088 · Oficina comercial en San Borja · Planta en La Molina · Hecho en Perú</span>
+  <span>+51 954 966 626 · Instagram @kinetix.nutrition · www.kinetixnutrition.pe</span>
+</footer>
+
+<script>
+const $=id=>document.getElementById(id);
+function pouch(a,b,n){return `<svg viewBox="0 0 160 220" aria-hidden="true"><rect width="160" height="220" rx="10" fill="#FDF3DC"/><circle cx="150" cy="10" r="72" fill="#${a}"/><circle cx="130" cy="220" r="62" fill="#${b}"/><circle cx="118" cy="150" r="34" fill="#${b}"/><text x="14" y="38" font-size="12" letter-spacing="3" fill="#141414" font-family="Fira Sans,Arial">KINETIX</text><text x="12" y="92" font-size="34" font-weight="900" font-style="italic" fill="#141414" font-family="Arial Black,Arial">C-PRIX</text><text x="14" y="120" font-size="13" font-weight="600" fill="#${a}" font-family="Fira Sans,Arial">${n}</text><text x="14" y="196" font-size="24" font-weight="800" fill="#141414" font-family="Arial">34</text></svg>`}
+$("pouches").innerHTML=pouch("EC6B3B","F0C020","Naranja")+pouch("B41B6E","EB5FA3","Frutos Rojos");
+
+let sc=2;
+function scoops(){$("sc").textContent=sc+(sc===1?" scoop":" scoops");$("oc").textContent=25*sc+" g";$("on").textContent=200*sc+" mg"}
+$("m").onclick=()=>{sc=Math.max(1,sc-1);scoops()};$("pl").onclick=()=>{sc=Math.min(6,sc+1);scoops()};scoops();
+
+/* ---------- tienda ---------- */
+const WA="51954966626";
+// PRECIO_PROVISIONAL: HYD-PRIX y RAW no tienen precio en la guía; ajústalos aquí.
+const P=[
+ {id:"cprix",name:"C-PRIX",desc:"Carbohidratos + electrolitos. Bolsa de 900 g, 34 porciones. Precio de lanzamiento.",price:95,old:110,style:"cream",warn:"Alto en azúcar · Alto en sodio",
+  v:[{n:"Naranja",bg:"FDF3DC",a:"EC6B3B",b:"F0C020"},{n:"Frutos Rojos",bg:"FDF3DC",a:"B41B6E",b:"EB5FA3"}]},
+ {id:"hyd",name:"HYD-PRIX",desc:"Electrolitos en polvo con sabor natural, sin colorantes. 100 g, 33 porciones.",price:39,style:"dark",
+  v:[{n:"Maracumango",bg:"231F20",a:"F7922B",b:"F7922B"},{n:"Limón",bg:"231F20",a:"A7CF3A",b:"A7CF3A"}]},
+ {id:"raw",name:"RAW",desc:"Electrolitos sin sabor, ideales para mezclar con C-PRIX. 100 g, 33 porciones.",price:35,style:"light",
+  v:[{n:"Sin sabor",bg:"FFFFFF",a:"2A8FD4",b:"2A8FD4"}]}
+];
+const money=n=>"S/ "+n.toFixed(2);
+const sel={},qty={};P.forEach(p=>{sel[p.id]=0;qty[p.id]=1});
+let cart=[],cust={name:"",tel:"",addr:""};
+try{cart=JSON.parse(localStorage.getItem("kx-cart")||"[]")||[];cust=JSON.parse(localStorage.getItem("kx-cust")||"null")||cust}catch(e){}
+cart=cart.filter(c=>P.some(p=>p.id===c.id));
+const save=()=>{try{localStorage.setItem("kx-cart",JSON.stringify(cart));localStorage.setItem("kx-cust",JSON.stringify(cust))}catch(e){}};
+function art(p,v){
+  if(p.style==="cream")return pouch(v.a,v.b,v.n);
+  const dark=p.style==="dark",bg=dark?"#"+v.bg:"#FFFFFF",fg=dark?"#fff":"#141414";
+  return `<svg viewBox="0 0 160 220" role="img" aria-label="${p.name} ${v.n}"><rect width="160" height="220" rx="10" fill="${bg}" stroke="#DDD8CC"/><polygon points="108,60 170,60 170,76 122,76" fill="#${v.a}"/><polygon points="62,230 150,100 175,100 175,230" fill="#${v.a}" opacity=".85"/><text x="14" y="38" font-size="12" letter-spacing="3" fill="${fg}" font-family="Fira Sans,Arial">KINETIX</text><text x="12" y="92" font-size="${p.name.length>4?26:40}" font-weight="900" font-style="italic" fill="${fg}" font-family="Arial Black,Arial">${p.name}</text><text x="14" y="112" font-size="11" font-weight="600" fill="#${v.a}" font-family="Fira Sans,Arial">${v.n}</text><text x="14" y="196" font-size="13" font-weight="700" fill="${fg}" font-family="Arial">100 g</text></svg>`;
+}
+function renderGrid(){
+  $("grid").innerHTML=P.map(p=>{const v=p.v[sel[p.id]];return `<article class="s-card" data-id="${p.id}">
+   <div class="s-pic">${art(p,v)}</div>
+   <h3 class="disp">${p.name}</h3><p>${p.desc}</p>
+   <div class="s-chips" role="group" aria-label="Sabor">${p.v.length>1?p.v.map((x,i)=>`<button type="button" class="s-chip" data-v="${i}" aria-pressed="${i===sel[p.id]}"><i style="background:#${x.a}"></i>${x.n}</button>`).join(""):`<span class="s-chip fixed"><i style="background:#${v.a}"></i>${v.n}</span>`}</div>
+   ${p.warn?`<span class="s-warn">${p.warn}</span>`:""}
+   <div class="s-row"><div class="s-price">${money(p.price)}${p.old?`<s>${money(p.old)}</s>`:""}</div>
+    <div class="s-qty"><button type="button" data-q="-1" aria-label="Menos">−</button><span>${qty[p.id]}</span><button type="button" data-q="1" aria-label="Más">+</button></div></div>
+   <button type="button" class="s-add" data-add>Agregar al pedido</button></article>`}).join("");
+}
+$("grid").addEventListener("click",e=>{
+  const card=e.target.closest(".s-card");if(!card)return;const p=P.find(x=>x.id===card.dataset.id);
+  const chip=e.target.closest("[data-v]"),q=e.target.closest("[data-q]");
+  if(chip){sel[p.id]=+chip.dataset.v;renderGrid()}
+  else if(q){qty[p.id]=Math.max(1,Math.min(20,qty[p.id]+ +q.dataset.q));renderGrid()}
+  else if(e.target.closest("[data-add]")){
+    const key=p.id+"|"+sel[p.id],it=cart.find(c=>c.k===key);
+    if(it)it.q+=qty[p.id];else cart.push({k:key,id:p.id,vi:sel[p.id],q:qty[p.id]});
+    qty[p.id]=1;renderGrid();openCart();
+  }
+});
+function update(){
+  const L=cart.map(c=>{const p=P.find(x=>x.id===c.id),v=p.v[c.vi]||p.v[0];return{c,p,v,sub:p.price*c.q}});
+  const total=L.reduce((s,l)=>s+l.sub,0),n=cart.reduce((s,c)=>s+c.q,0);
+  $("cnt").textContent=n;$("tot").textContent=money(total);
+  $("items").innerHTML=L.length?L.map(l=>`<div class="c-it" data-k="${l.c.k}">${art(l.p,l.v)}<div class="c-n">${l.p.name}<small>${l.v.n} · ${money(l.sub)}</small></div><div class="s-qty"><button type="button" data-d="-1" aria-label="Menos">−</button><span>${l.c.q}</span><button type="button" data-d="1" aria-label="Más">+</button></div></div>`).join(""):`<p class="c-empty">Tu pedido está vacío. Agrega un producto desde la <a href="#tienda">tienda</a>.</p>`;
+  $("pay").hidden=!L.length;
+  $("bar").hidden=!(n>0&&!$("cart").classList.contains("on"));
+  $("barn").textContent=n+(n===1?" producto":" productos");$("bart").textContent=money(total)+" · Pedir";
+  const ok=L.length&&cust.name.trim().length>1&&cust.tel.replace(/\D/g,"").length>=7&&cust.addr.trim().length>4;
+  const s=$("send");s.setAttribute("aria-disabled",ok?"false":"true");
+  $("sendHint").textContent=ok?"Se abre WhatsApp con tu pedido listo para enviar. Coordinamos el pago y el envío contigo.":"Completa nombre, celular y dirección para enviar el pedido. Precios con IGV incluido.";
+  const msg=["Hola Kinetix, quiero hacer este pedido:",...L.map(l=>`• ${l.c.q} × ${l.p.name} ${l.v.n} (${money(l.sub)})`),`Total: ${money(total)}`,"",`Nombre: ${cust.name}`,`Celular: ${cust.tel}`,`Dirección: ${cust.addr}`].join("\n");
+  s.href=ok?`https://wa.me/${WA}?text=${encodeURIComponent(msg)}`:"#";
+  save();
+}
+$("items").addEventListener("click",e=>{
+  if(e.target.closest('a[href="#tienda"]')){closeCart();return}
+  const b=e.target.closest("[data-d]");if(!b)return;const k=b.closest(".c-it").dataset.k,c=cart.find(x=>x.k===k);
+  c.q+=+b.dataset.d;if(c.q<1)cart=cart.filter(x=>x.k!==k);update();
+});
+[["f-name","name"],["f-tel","tel"],["f-addr","addr"]].forEach(([id,k])=>{const el=$(id);el.value=cust[k]||"";el.addEventListener("input",()=>{cust[k]=el.value;update()})});
+$("send").addEventListener("click",e=>{if($("send").getAttribute("aria-disabled")==="true")e.preventDefault()});
+function openCart(){$("cart").classList.add("on");$("scrim").classList.add("on");$("cart").setAttribute("aria-hidden","false");update();$("close").focus()}
+function closeCart(){$("cart").classList.remove("on");$("scrim").classList.remove("on");$("cart").setAttribute("aria-hidden","true");update()}
+$("open").onclick=openCart;$("bar").onclick=openCart;$("close").onclick=closeCart;$("scrim").onclick=closeCart;
+document.addEventListener("keydown",e=>{if(e.key==="Escape")closeCart()});
+renderGrid();update();
+
+const pages=["inicio","como-se-usa","calculadora","tienda"];
+const frame=$("calc");
+function fit(){try{const d=frame.contentDocument;if(!d||!d.body)return;const h=Math.max(d.documentElement.scrollHeight,d.body.scrollHeight);if(h>300)frame.style.height=h+"px"}catch(e){}}
+frame.addEventListener("load",()=>{fit();try{new ResizeObserver(fit).observe(frame.contentDocument.body)}catch(e){}});
+function route(){
+  let h=location.hash.replace("#","");if(!pages.includes(h))h="inicio";
+  pages.forEach(p=>$("p-"+p).classList.toggle("on",p===h));
+  document.querySelectorAll("nav a").forEach(a=>{if(a.getAttribute("href")==="#"+h)a.setAttribute("aria-current","page");else a.removeAttribute("aria-current")});
+  window.scrollTo(0,0);if(h==="calculadora")setTimeout(fit,50);
+}
+window.addEventListener("hashchange",route);route();
+</script>
+
+</body>
+</html>
