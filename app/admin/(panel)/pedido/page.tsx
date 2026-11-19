@@ -1,16 +1,31 @@
+"use client";
+import { Suspense } from "react";
 import Link from "next/link";
-import { notFound } from "next/navigation";
-import { getOrder, STATUSES } from "@/lib/catalog";
+import { useSearchParams } from "next/navigation";
+import { setOrderStatus, STATUSES, useDb } from "@/lib/store";
 import { money } from "@/lib/types";
-import { statusAction } from "../../../actions";
-import { fmtDate } from "../../fmt";
+import { fmtDate } from "../fmt";
 
-export const metadata = { title: "Pedido" };
+export default function PedidoAdminPage() {
+  return (
+    <Suspense fallback={null}>
+      <PedidoAdmin />
+    </Suspense>
+  );
+}
 
-export default async function PedidoAdmin({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
-  const o = getOrder(Number(id));
-  if (!o) notFound();
+function PedidoAdmin() {
+  const db = useDb();
+  const id = Number(useSearchParams().get("id"));
+  if (!db) return null;
+  const o = db.orders.find((x) => x.id === id);
+  if (!o)
+    return (
+      <>
+        <p><Link href="/admin/pedidos">← Pedidos</Link></p>
+        <div className="panel" style={{ marginTop: 16 }}>Ese pedido no existe en esta demostración.</div>
+      </>
+    );
   const phone = o.phone.replace(/\D/g, "");
   const wa = `https://wa.me/${phone.length === 9 ? "51" + phone : phone}?text=${encodeURIComponent(`Hola ${o.customerName.split(" ")[0]}, te escribimos de Kinetix por tu pedido ${o.code}.`)}`;
   return (
@@ -19,17 +34,14 @@ export default async function PedidoAdmin({ params }: { params: Promise<{ id: st
       <h1 style={{ marginTop: 10 }}>{o.code}</h1>
       <p className="adm-sub">
         {fmtDate(o.createdAt)} · <span className={`pill st-${o.status}`}>{STATUSES.find((s) => s.id === o.status)?.label}</span>
+        {o.sample && " · pedido de ejemplo"}
       </p>
 
       <div className="panel">
         <h2>Estado</h2>
         <div className="status-row">
           {STATUSES.map((s) => (
-            <form key={s.id} action={statusAction}>
-              <input type="hidden" name="id" value={o.id} />
-              <input type="hidden" name="status" value={s.id} />
-              <button type="submit" aria-pressed={o.status === s.id}>{s.label}</button>
-            </form>
+            <button key={s.id} type="button" aria-pressed={o.status === s.id} onClick={() => setOrderStatus(o.id, s.id)}>{s.label}</button>
           ))}
         </div>
         <p className="s-meta" style={{ marginTop: 10 }}>Al cancelar, las unidades vuelven al stock. Si reactivas un pedido cancelado, se descuentan de nuevo.</p>

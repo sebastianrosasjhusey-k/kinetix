@@ -1,14 +1,10 @@
 import Link from "next/link";
-import { listProducts } from "@/lib/catalog";
 import { CartButton, CartProvider } from "@/components/Cart";
 import { Nav } from "@/components/Nav";
 
-export const dynamic = "force-dynamic";
-
 export default function SiteLayout({ children }: { children: React.ReactNode }) {
-  const products = listProducts();
   return (
-    <CartProvider products={products}>
+    <CartProvider>
       <header className="site-header">
         <div className="bar pad">
           <Link className="logo" href="/">KINETIX</Link>
@@ -16,6 +12,7 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
           <CartButton />
         </div>
       </header>
+      <p className="demo-bar pad">Versión de demostración: los pedidos se guardan solo en este navegador y no se cobran.</p>
       <main>{children}</main>
       <footer className="site-footer pad">
         <b>KINETIX NUTRITION</b>

@@ -3,9 +3,12 @@ import { useState } from "react";
 import { money, type Product } from "@/lib/types";
 import { Pouch } from "./Pouch";
 import { useCart } from "./Cart";
+import { useDb } from "@/lib/store";
 
 export function Shop() {
   const { products } = useCart();
+  const db = useDb();
+  if (!db) return <p className="lead">Cargando productos…</p>;
   if (!products.length) return <p className="lead">Pronto volveremos a tener productos disponibles.</p>;
   return (
     <div className="s-grid">

@@ -1,10 +1,10 @@
-import { requireUser } from "@/lib/auth";
+"use client";
+import { currentUser, useDb } from "@/lib/store";
 import { PasswordForm } from "./PasswordForm";
 
-export const metadata = { title: "Cuenta" };
-
-export default async function Cuenta() {
-  const u = await requireUser();
+export default function Cuenta() {
+  const u = currentUser(useDb());
+  if (!u) return null;
   return (
     <>
       <h1>Cuenta</h1>

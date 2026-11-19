@@ -1,15 +1,30 @@
+"use client";
+import { Suspense } from "react";
 import Link from "next/link";
-import { notFound } from "next/navigation";
-import { getOrderByCode } from "@/lib/catalog";
+import { useSearchParams } from "next/navigation";
+import { useDb } from "@/lib/store";
 import { money, WHATSAPP } from "@/lib/types";
 
-export const metadata = { title: "Pedido recibido" };
+export default function PedidoPage() {
+  return (
+    <Suspense fallback={<section className="pad"><p className="lead">Cargando tu pedido…</p></section>}>
+      <Pedido />
+    </Suspense>
+  );
+}
 
-export default async function Pedido({ params, searchParams }: { params: Promise<{ code: string }>; searchParams: Promise<{ k?: string }> }) {
-  const { code } = await params;
-  const { k } = await searchParams;
-  const o = k ? getOrderByCode(code, k) : null;
-  if (!o) notFound();
+function Pedido() {
+  const q = useSearchParams();
+  const db = useDb();
+  if (!db) return <section className="pad"><p className="lead">Cargando tu pedido…</p></section>;
+  const o = db.orders.find((x) => x.code === q.get("c") && x.key === q.get("k"));
+  if (!o)
+    return (
+      <section className="pad">
+        <h1 className="disp page-title">Pedido no encontrado</h1>
+        <p className="lead">Revisa el enlace o vuelve a la <Link href="/tienda">tienda</Link>. En esta demostración, los pedidos solo se ven en el navegador donde se hicieron.</p>
+      </section>
+    );
 
   const msg = [
     `Hola Kinetix, acabo de hacer el pedido ${o.code}.`,
@@ -46,7 +61,9 @@ export default async function Pedido({ params, searchParams }: { params: Promise
           </a>
           <Link className="btn btn-ink" href="/tienda">Seguir comprando</Link>
         </div>
-        <p className="fine" style={{ marginTop: 14 }}>Si pagas con Yape, Plin o transferencia, envíanos la constancia por WhatsApp con tu número de pedido.</p>
+        <p className="fine" style={{ marginTop: 14 }}>
+          Para ver este pedido del lado del negocio, entra al <Link href="/admin">panel de administración</Link> (usuario admin@kinetix.pe, contraseña kinetix2026).
+        </p>
       </div>
     </section>
   );

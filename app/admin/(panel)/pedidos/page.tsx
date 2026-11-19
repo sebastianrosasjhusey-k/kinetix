@@ -1,14 +1,25 @@
+"use client";
+import { Suspense } from "react";
 import Link from "next/link";
-import { listOrders, STATUSES } from "@/lib/catalog";
+import { useSearchParams } from "next/navigation";
+import { STATUSES, useDb } from "@/lib/store";
 import { money } from "@/lib/types";
 import { fmtDate } from "../fmt";
 
-export const metadata = { title: "Pedidos" };
+export default function PedidosPage() {
+  return (
+    <Suspense fallback={null}>
+      <Pedidos />
+    </Suspense>
+  );
+}
 
-export default async function Pedidos({ searchParams }: { searchParams: Promise<{ estado?: string }> }) {
-  const { estado } = await searchParams;
+function Pedidos() {
+  const db = useDb();
+  const estado = useSearchParams().get("estado") ?? undefined;
+  if (!db) return null;
   const valid = STATUSES.some((s) => s.id === estado) ? estado : undefined;
-  const orders = listOrders(valid);
+  const orders = [...db.orders].sort((a, b) => b.id - a.id).filter((o) => !valid || o.status === valid);
   return (
     <>
       <h1>Pedidos</h1>
@@ -28,7 +39,7 @@ export default async function Pedidos({ searchParams }: { searchParams: Promise<
             <tbody>
               {orders.map((o) => (
                 <tr key={o.id}>
-                  <td><Link href={`/admin/pedidos/${o.id}`}>{o.code}</Link></td>
+                  <td><Link href={`/admin/pedido?id=${o.id}`}>{o.code}</Link></td>
                   <td>{o.customerName}<br /><span className="s-meta">{o.district}</span></td>
                   <td>{o.items.map((i) => `${i.qty}× ${i.productName} ${i.variantName}`).join(", ")}</td>
                   <td>{o.payment}</td>

@@ -3,8 +3,17 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { money, type Product } from "@/lib/types";
+
+function validate(c: { name: string; phone: string; email: string; address: string; district: string }) {
+  if (c.name.trim().length < 2) return "Escribe tu nombre.";
+  if (c.phone.replace(/\D/g, "").length < 9) return "Escribe un celular de 9 dígitos para coordinar la entrega.";
+  if (c.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(c.email)) return "Revisa el correo: no tiene un formato válido.";
+  if (c.address.trim().length < 5) return "Escribe la dirección de entrega.";
+  if (c.district.trim().length < 2) return "Escribe el distrito.";
+  return "";
+}
 import { Pouch } from "./Pouch";
-import { placeOrder } from "@/app/(sitio)/actions";
+import { activeProducts, createOrder, OrderError, PAYMENTS, useDb } from "@/lib/store";
 
 type Line = { variantId: number; qty: number };
 type Ctx = {
@@ -40,16 +49,19 @@ const write = (k: string, v: unknown) => {
   } catch {}
 };
 
-export function CartProvider({ products, children }: { products: Product[]; children: React.ReactNode }) {
+export function CartProvider({ children }: { children: React.ReactNode }) {
+  const db = useDb();
+  const products = useMemo(() => (db ? activeProducts(db) : []), [db]);
   const [lines, setLines] = useState<Line[]>([]);
   const [open, setOpen] = useState(false);
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
+    if (!db || ready) return;
     const valid = new Set(products.flatMap((p) => p.variants.map((v) => v.id)));
     setLines(read<Line[]>(LS_CART, []).filter((l) => valid.has(l.variantId) && l.qty > 0));
     setReady(true);
-  }, [products]);
+  }, [db, products, ready]);
   useEffect(() => {
     if (ready) write(LS_CART, lines);
   }, [lines, ready]);
@@ -144,14 +156,19 @@ function CartDrawer() {
     setError("");
     const { notes: _n, ...keep } = c;
     write(LS_CUST, keep);
-    const r = await placeOrder({ ...c, items: rows.map((r) => ({ variantId: r.variantId, qty: r.qty })) });
-    if (r.ok) {
+    const err = validate(c);
+    if (err) {
+      setError(err);
+      setBusy(false);
+      return;
+    }
+    try {
+      const r = createOrder({ ...c, name: c.name.trim(), items: rows.map((r) => ({ variantId: r.variantId, qty: r.qty })) });
       clear();
       setOpen(false);
-      router.push(`/pedido/${r.code}?k=${r.key}`);
-    } else {
-      setError(r.error);
-      router.refresh();
+      router.push(`/pedido/?c=${r.code}&k=${r.key}`);
+    } catch (e) {
+      setError(e instanceof OrderError ? e.message : "No pudimos guardar el pedido. Inténtalo de nuevo.");
     }
     setBusy(false);
   }
@@ -203,7 +220,7 @@ function CartDrawer() {
                 <label>Correo (opcional)<input id="c-email" type="email" value={c.email} onChange={set("email")} autoComplete="email" /></label>
                 <fieldset className="pay-opts" style={{ border: 0, padding: 0 }}>
                   <legend style={{ fontSize: 14, fontWeight: 600, marginBottom: 6 }}>Cómo vas a pagar</legend>
-                  {["Yape / Plin", "Transferencia bancaria", "Efectivo contra entrega"].map((p) => (
+                  {PAYMENTS.map((p) => (
                     <label key={p}>
                       <input type="radio" name="payment" value={p} checked={c.payment === p} onChange={() => setC({ ...c, payment: p })} />
                       {p}

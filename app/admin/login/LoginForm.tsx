@@ -1,24 +1,46 @@
 "use client";
-import { useActionState } from "react";
-import { loginAction } from "../actions";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { currentUser, login, useDb } from "@/lib/store";
 
 export function LoginForm() {
-  const [state, action, pending] = useActionState(loginAction, undefined);
+  const router = useRouter();
+  const db = useDb();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [pending, setPending] = useState(false);
+
+  useEffect(() => {
+    if (currentUser(db)) router.replace("/admin");
+  }, [db, router]);
+
+  async function submit(e: React.FormEvent) {
+    e.preventDefault();
+    setPending(true);
+    setError("");
+    if (await login(email, password)) router.replace("/admin");
+    else {
+      setError("Correo o contraseña incorrectos.");
+      setPending(false);
+    }
+  }
+
   return (
-    <form action={action}>
+    <form onSubmit={submit}>
       <h1>Panel Kinetix</h1>
       <p>Ingresa para ver pedidos y administrar productos.</p>
       <label className="field">
         Correo
-        <input id="email" name="email" type="email" required autoComplete="username" defaultValue={state?.email} key={state?.email} />
+        <input id="email" name="email" type="email" required autoComplete="username" value={email} onChange={(e) => setEmail(e.target.value)} />
       </label>
       <label className="field">
         Contraseña
-        <input id="password" name="password" type="password" required autoComplete="current-password" />
+        <input id="password" name="password" type="password" required autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} />
       </label>
-      {state?.error && <p className="err" role="alert">{state.error}</p>}
+      {error && <p className="err" role="alert">{error}</p>}
       <button className="abtn red" type="submit" disabled={pending}>{pending ? "Ingresando…" : "Ingresar"}</button>
-      <div className="demo">Usuario de prueba: admin@kinetix.pe · contraseña kinetix2026. Cámbiala en Cuenta después de ingresar.</div>
+      <div className="demo">Usuario de prueba: admin@kinetix.pe · contraseña kinetix2026.</div>
     </form>
   );
 }
