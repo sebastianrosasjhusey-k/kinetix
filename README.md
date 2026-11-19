@@ -1,4 +1,6 @@
-# Kinetix Nutrition · tienda web
+# Kinetix Nutrition · tienda web (versión con servidor)
+
+Esta rama es la versión real, con base de datos SQLite. El mockup que se publica en Netlify está en `main` y simula los datos en el navegador. Ver `CLAUDE.md` para cómo se mantienen iguales.
 
 Sitio público de C-PRIX y panel de administración, hecho con **Next.js 15 (React)** y una base de datos **SQLite propia** que usa el SQLite integrado en Node. No depende de servicios externos.
 
@@ -7,7 +9,7 @@ Sitio público de C-PRIX y panel de administración, hecho con **Next.js 15 (Rea
 **Sitio público**
 - `/` Beneficios de C-PRIX
 - `/como-se-usa` Pasos, dosis y contador de scoops
-- `/calculadora` Calculadora de plan de carrera (`public/calculadora.html`)
+- `/calculadora` Calculadora de plan de carrera (`public/plan-de-carrera.html`)
 - `/tienda` Productos con sabores, stock y carrito
 - `/pedido/[código]` Confirmación del pedido con botón de WhatsApp
 

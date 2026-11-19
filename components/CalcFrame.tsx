@@ -29,5 +29,5 @@ export function CalcFrame() {
       ro?.disconnect();
     };
   }, []);
-  return <iframe ref={ref} className="calc-frame" src="/calculadora.html" title="Calculadora de plan de carrera Kinetix" />;
+  return <iframe ref={ref} className="calc-frame" src="/plan-de-carrera.html" title="Calculadora de plan de carrera Kinetix" />;
 }
