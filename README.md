@@ -40,7 +40,7 @@ La base de datos se crea sola en `data/kinetix.db` con los productos y el usuari
 
 Tablas: `products`, `variants` (sabores con stock), `orders`, `order_items`, `users`, `sessions`. El esquema y los datos iniciales están en `lib/db.ts`. Las contraseñas se guardan con scrypt y las sesiones en una cookie httpOnly que dura 7 días.
 
-Los precios de HYD-PRIX (S/ 39) y RAW (S/ 35) son provisionales: cámbialos desde el panel.
+Los precios iniciales son HYD-PRIX S/ 35 y RAW S/ 30. Solo se cargan al crear la base: si `data/kinetix.db` ya existe, cámbialos desde el panel.
 
 ## Dónde publicarlo
 

@@ -139,13 +139,13 @@ function seed(d: DB) {
       {
         slug: "hyd-prix", name: "HYD-PRIX", tagline: "Electrolitos en polvo",
         description: "300 mg de sodio, 150 mg de potasio, 63 mg de calcio y 36 mg de magnesio por porción. Sabor natural, sin colorantes.",
-        size: "100 g · 33 porciones", price: 3900, compare: null, warning: null, style: "dark",
+        size: "100 g · 33 porciones", price: 3500, compare: null, warning: null, style: "dark",
         variants: [["Maracumango", "F7922B", "F7922B", 40], ["Limón", "A7CF3A", "A7CF3A", 40]],
       },
       {
         slug: "raw", name: "RAW", tagline: "Electrolitos sin sabor",
         description: "La misma composición de electrolitos que HYD-PRIX, sin saborizantes ni colorantes. Ideal para mezclar con C-PRIX.",
-        size: "100 g · 33 porciones", price: 3500, compare: null, warning: null, style: "light",
+        size: "100 g · 33 porciones", price: 3000, compare: null, warning: null, style: "light",
         variants: [["Sin sabor", "2A8FD4", "2A8FD4", 40]],
       },
     ];
