@@ -29,7 +29,7 @@ type User = { id: number; email: string; name: string; passHash: string };
 type Data = { version: number; seededAt: string; products: Product[]; orders: Order[]; users: User[]; session: number | null };
 
 const KEY = "kx-demo-db";
-const VERSION = 1;
+const VERSION = 2;
 
 export const PAYMENTS = ["Yape / Plin", "Transferencia bancaria", "Efectivo contra entrega"] as const;
 export const STATUSES = [
@@ -65,7 +65,7 @@ function seed(): Data {
     {
       id: 2, slug: "hyd-prix", name: "HYD-PRIX", tagline: "Electrolitos en polvo",
       description: "300 mg de sodio, 150 mg de potasio, 63 mg de calcio y 36 mg de magnesio por porción. Sabor natural, sin colorantes.",
-      size: "100 g · 33 porciones", priceCents: 3900, compareCents: null, warning: null, style: "dark", active: true,
+      size: "100 g · 33 porciones", priceCents: 3500, compareCents: null, warning: null, style: "dark", active: true,
       variants: [
         { id: 3, name: "Maracumango", colorA: "F7922B", colorB: "F7922B", stock: 38, active: true },
         { id: 4, name: "Limón", colorA: "A7CF3A", colorB: "A7CF3A", stock: 8, active: true },
@@ -74,7 +74,7 @@ function seed(): Data {
     {
       id: 3, slug: "raw", name: "RAW", tagline: "Electrolitos sin sabor",
       description: "La misma composición de electrolitos que HYD-PRIX, sin saborizantes ni colorantes. Ideal para mezclar con C-PRIX.",
-      size: "100 g · 33 porciones", priceCents: 3500, compareCents: null, warning: null, style: "light", active: true,
+      size: "100 g · 33 porciones", priceCents: 3000, compareCents: null, warning: null, style: "light", active: true,
       variants: [{ id: 5, name: "Sin sabor", colorA: "2A8FD4", colorB: "2A8FD4", stock: 39, active: true }],
     },
   ];
