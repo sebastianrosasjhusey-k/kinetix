@@ -15,3 +15,7 @@ Hay **dos versiones** del mismo sitio y deben quedar iguales para el cliente:
 - Los datos iniciales (productos, precios, stock, usuario admin) están en `seed()` de `lib/store.ts` y de `lib/db.ts`: si cambian, cambiar los dos.
 
 Antes de subir: `npm run build` sin errores en cada rama.
+
+## `operaciones/` (software interno, aparte del sitio)
+
+Proyecto Node/TypeScript independiente para gestionar pedidos, inventario y clientes (ver `operaciones/README.md`). No forma parte de la tienda: no se replica en `app-nextjs` y está excluido del `tsconfig.json` raíz. Si cambian productos o precios en `seed()`, actualizar también `operaciones/src/seed.ts`. Antes de subir: `npm test` y `npm run typecheck` dentro de `operaciones/`.
