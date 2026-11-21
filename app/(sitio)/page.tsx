@@ -14,7 +14,7 @@ const BENEFICIOS = [
   ["Energía y sodio en una mezcla", "Carbohidratos y electrolitos en un solo polvo. Sin combinar productos ni hacer cuentas."],
   ["Sal rosada amazónica", "El sodio viene de sal rosada amazónica y no solo de cloruro de sodio."],
   ["Aporte completo por porción", "25 g de carbohidratos y 200 mg de sodio por scoop. Para una persona promedio no hace falta agregar más sodio."],
-  ["Sin apelmazamiento", "Insumos tamizados al mismo gramaje: no deja grumos en el fondo de la botella."],
+  ["Sin grumos", "Insumos tamizados al mismo gramaje: no deja grumos en el fondo de la botella."],
   ["Sabores suaves", "Naranja y Frutos Rojos, que no empalagan ni en dosis altas."],
   ["Formato en polvo", "Lo preparas en tu bidón con la cantidad de agua que prefieras."],
 ];
